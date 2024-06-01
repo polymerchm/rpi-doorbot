@@ -22,8 +22,6 @@ redis_cli = Redis()
 if not redis_cli.get(REBOOT_TIME):
     initializeRedis()
 
-
-
 gpio = Config.get('gpio')
 pi = pigpio.pi()
 
