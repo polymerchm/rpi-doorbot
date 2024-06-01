@@ -1,0 +1,13 @@
+gpio:
+  data0:  1
+  data1:  2
+  timeout = 5 # ms
+
+memberpress:
+  user: bodgery
+  password: bodgery
+  base_url: https://mms.thebodgery.org
+  
+  
+
+  
