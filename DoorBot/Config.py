@@ -15,7 +15,7 @@ def init(
         .parent \
         .resolve()
     full_conf_path = pathlib \
-        .PurePath( cur_dir, '../', file_path )
+        .PurePath( cur_dir, file_path )
 
     yaml_input = pathlib.Path( full_conf_path ).read_text()
     global CONF
