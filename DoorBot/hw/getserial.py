@@ -15,3 +15,6 @@ def getserial():
     cpuserial = "ERROR000000000"
  
   return cpuserial
+
+if __name__ == '__main__':
+  print(getserial())
