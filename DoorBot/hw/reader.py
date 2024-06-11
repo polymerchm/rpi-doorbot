@@ -4,7 +4,7 @@ import hw.wiegand as wiegand
 import DoorBot.Config as Config
 import pigpio
 from hw.initializeRedis import initializeRedis
-from ..DoorBot.constants import *
+from DoorBot.constants import *
 from time import sleep
 import signal, sys, os
 
@@ -16,17 +16,13 @@ import signal, sys, os
 RUN_LOOP_ACTIVE = False
 DEBUG = os.environ.get("DEBUG", True)
 redis_cli = Redis()
+pubsub = redis_cli.pubsub()
+pubsub.subscribe('reader')
 
 def signalHandler(sig, frame):
-    stopReader()
-    sys.exit(0)
+    redis_cli.publish('reader', 'stop')
 
-def stopReader():
-    """
-    catch any interrupts and kill event loop
-    """
-    global RUN_LOOP_ACTIVE
-    RUN_LOOP_ACTIVE = False
+
 
 def callback(bits, value):  
         """
@@ -35,7 +31,7 @@ def callback(bits, value):
         if DEBUG:
             print(f"Weigand output: bits={bits}, value={value}")
         
-        redis_cli.publish('doorbot', value)
+        redis_cli.publish('reader', value)
 
 
 
@@ -43,14 +39,12 @@ def main():
     """
     main event loop
     """
-    global RUN_LOOP_ACTIVE
+ 
 
     signal.signal(signal.SIGINT, signalHandler)
     signal.signal(signal.SIGTERM, signalHandler)
 
-    RUN_LOOP_ACTIVE = True
-    
-    
+
     # if empty, load up initialization values from config file
 
     if not redis_cli.get(REBOOT_TIME):
@@ -62,8 +56,23 @@ def main():
    
     w = wiegand(pi, gpio['data0'], gpio['data1'], callback, timing['timeout'])
 
-    while RUN_LOOP_ACTIVE:
-        sleep(1)
+    for message in pubsub.listen():
+        if DEBUG:
+            print(message)
+        message_type = message['type']
+        if message_type == 'subscribe':
+            continue
+        elif message_type == 'message':
+            data = message['data'].decode("utf-8")
+            if data == 'stop': # stop the daemmon
+                 break
+            else:
+                pass
+                #check against the list of valid tokens
+                #if valid
+                #redis_cli.publish('doorbot', 'open')
+                # if not there, chcek against the mms set
+
 
     w.cancel()
     pi.stop()

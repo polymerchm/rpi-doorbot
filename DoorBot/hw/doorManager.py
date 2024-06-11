@@ -79,7 +79,7 @@ def main():
     print("doorManager daemon stopping")  
     closeDoor()
     redis_cli.set(DOOR_STATE, 'closed')
-    #pi.close() 
+    #pi.stop() 
 
 
 if __name__ == '__main__': 
