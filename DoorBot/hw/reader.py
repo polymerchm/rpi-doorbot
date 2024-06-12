@@ -70,7 +70,7 @@ def main():
                 pass
                 #check against the list of valid tokens
                 #if valid
-                #redis_cli.publish('doorbot', 'open')
+                #redis_cli.publish(DOOR_MANAGER, 'open')
                 # if not there, chcek against the mms set
 
 

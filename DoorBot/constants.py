@@ -11,4 +11,5 @@ FOB_LIST = 'fob_list'
 INVALID_FOB_LIST  = 'invalid_fob_list'
 LAST_FOB = 'last_fob'
 DOOR_STATE = 'door_state'
+DOOR_MANAGER = 'doorbot'
 

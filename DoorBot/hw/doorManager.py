@@ -7,11 +7,17 @@ import sys, os, signal, time
 import threading
 
 timing = Config.get('timing')
+gpio = Config.get('gpio')
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
-pubsub.subscribe('doorbot')
+pubsub.subscribe(DOOR_MANAGER)
 
 
+pi = pigpio.pi()
+door = gpio['door']
+pi.set_mode(door, pigpio.OUTPUT)
+pi.set_pull_up_down(door, pigpio.PUD_DOWN)
+pi.write(door,pigpio.LOW)
 
 
 DEBUG = True
@@ -20,21 +26,24 @@ def openDoor():
     if DEBUG:
         print("open door request")
     redis_cli.set(DOOR_STATE, 'opened')
+    pi.write(door,pigpio.HIGH)
+    
 
 def closeDoor():
     if DEBUG:
         print("close door request")
     redis_cli.set(DOOR_STATE, 'closed')
+    pi.write(door,pigpio.LOW)
 
 def signalHandler(sig, frame):
     if DEBUG:
         print(f"stop requested via sigterm or sigint {sig}")
-    redis_cli.publish('doorbot','stop')
+    redis_cli.publish(DOOR_MANAGER,'stop')
 
 def triggerDoorClose():
     if DEBUG:
         print("door close triggered")
-    redis_cli.publish('doorbot', 'close')
+    redis_cli.publish(DOOR_MANAGER, 'close')
 
 
 def main():

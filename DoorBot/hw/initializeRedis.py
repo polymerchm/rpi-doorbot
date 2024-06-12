@@ -1,5 +1,5 @@
 from redis import Redis
-from ..DoorBot.constants import  *
+from DoorBot.constants import  *
 from lastreboot import lastreboot
 from getserial import getserial
 
