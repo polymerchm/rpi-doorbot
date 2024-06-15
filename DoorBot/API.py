@@ -2,6 +2,9 @@
 from redis import Redis
 from flask import Flask, request, jsonify, Response
 import sys, signal, os
+import Config
+
+DEBUG = Config.get('DEBUG')
 
 
 
@@ -9,8 +12,6 @@ ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 def create_app():
     app = Flask(__name__)
-
-
 
 app = create_app()
 

@@ -8,53 +8,56 @@ import threading
 
 timing = Config.get('timing')
 gpio = Config.get('gpio')
+DEBUG = Config.get('DEBUG')
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
-pubsub.subscribe(DOOR_MANAGER)
+pubsub.subscribe(DOOR_LOCK)
+
+
+
 
 
 pi = pigpio.pi()
-door = gpio['door']
-pi.set_mode(door, pigpio.OUTPUT)
-pi.set_pull_up_down(door, pigpio.PUD_DOWN)
-pi.write(door,pigpio.LOW)
+lock = gpio['lock']
 
+pi.set_mode(lock, pigpio.OUTPUT)
+pi.set_pull_up_down(lock, pigpio.PUD_DOWN)
+pi.write(lock,pigpio.LOW)
 
-DEBUG = True
 
 def openDoor():
     if DEBUG:
-        print("open door request")
+        print("open lock request")
     redis_cli.set(DOOR_STATE, 'opened')
-    pi.write(door,pigpio.HIGH)
+    pi.write(lock,pigpio.HIGH)
     
 
 def closeDoor():
     if DEBUG:
-        print("close door request")
+        print("close lock request")
     redis_cli.set(DOOR_STATE, 'closed')
-    pi.write(door,pigpio.LOW)
+    pi.write(lock,pigpio.LOW)
 
 def signalHandler(sig, frame):
     if DEBUG:
         print(f"stop requested via sigterm or sigint {sig}")
-    redis_cli.publish(DOOR_MANAGER,'stop')
+    redis_cli.publish(DOOR_LOCK,'stop')
 
 def triggerDoorClose():
     if DEBUG:
-        print("door close triggered")
-    redis_cli.publish(DOOR_MANAGER, 'close')
+        print("lock close triggered")
+    redis_cli.publish(DOOR_LOCK, 'close')
 
 
 def main():
     """
-    use redis pubsub to react to door state change request events.
+    use redis pubsub to react to lock state change request events.
 
     valid data:
         'open' - 
-            if door is not already open, open it and set state to open
+            if lock is not already open, open it and set state to open
         'close' -
-            if door is not already closed, close it and set state to closed
+            if lock is not already closed, close it and set state to closed
         'stop'
             terminate the daemon cleanly
     """
@@ -69,15 +72,15 @@ def main():
             continue
         elif message['type'] == 'message':
             data = message['data'].decode("utf-8")
-            doorState = redis_cli.get(DOOR_STATE)
-            if data == 'open' and doorState != 'opened':
-                # open the door and start a timer to close it using threading
+            lockState = redis_cli.get(DOOR_STATE)
+            if data == 'open' and lockState != 'opened':
+                # open the lock and start a timer to close it using threading
                 openDoor()
-                delay = float(timing['doorOpenTime'])
+                delay = float(timing['lockOpenTime'])
                 print(f"Delay is {delay}")
                 closer = threading.Timer(delay, triggerDoorClose)
                 closer.start()
-            elif data == 'close' and doorState != 'closed':
+            elif data == 'close' and lockState != 'closed':
                 closeDoor()
             elif data == 'stop':
                 break
@@ -85,7 +88,7 @@ def main():
                 print("invalid message data")
 
 
-    print("doorManager daemon stopping")  
+    print("lockLock daemon stopping")  
     closeDoor()
     redis_cli.set(DOOR_STATE, 'closed')
     #pi.stop() 
@@ -93,7 +96,7 @@ def main():
 
 if __name__ == '__main__': 
     if DEBUG:
-        print("starting doorManager daemon")
+        print("starting lockLock daemon")
         main()
     else:
         print("run as a daemon")

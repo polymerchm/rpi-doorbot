@@ -7,14 +7,14 @@ from hw.initializeRedis import initializeRedis
 from DoorBot.constants import *
 from time import sleep
 import signal, sys, os
+import jsonpickel
 
 # Bodgery Raspberry Pi Zero 2 W Doorbot
 # reader daemon
 
 # author: polymerchm
 
-RUN_LOOP_ACTIVE = False
-DEBUG = os.environ.get("DEBUG", True)
+DEBUG = Config.get('DEBUG')
 redis_cli = Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe('reader')
@@ -22,16 +22,13 @@ pubsub.subscribe('reader')
 def signalHandler(sig, frame):
     redis_cli.publish('reader', 'stop')
 
-
-
 def callback(bits, value):  
         """
         receivevd data from the reader
         """
         if DEBUG:
             print(f"Weigand output: bits={bits}, value={value}")
-        
-        redis_cli.publish('reader', value)
+        redis_cli.publish('reader', jsonpickel.encode({'bits': bits, 'value': value}))
 
 
 
@@ -67,10 +64,13 @@ def main():
             if data == 'stop': # stop the daemmon
                  break
             else:
-                pass
+                data = jsonpickel.decode['data']
+                bits = data['bits']
+                token = data['value']
+
                 #check against the list of valid tokens
                 #if valid
-                #redis_cli.publish(DOOR_MANAGER, 'open')
+                #redis_cli.publish(DOOR_LOCK, 'open')
                 # if not there, chcek against the mms set
 
 

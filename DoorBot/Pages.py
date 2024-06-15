@@ -2,6 +2,9 @@ from flask_stache import render_template
 import flask
 from urllib.parse import urlparse
 from datetime import datetime
+import Config
+
+DEBUG = Config.get('DEBUG')
 
 
 def get_env():
