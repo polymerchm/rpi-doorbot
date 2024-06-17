@@ -45,7 +45,7 @@ class Button:
         self.pi.close()
 
 def resetDoorBot(button: Button):
-    button.close()
+    button.cancel()
     # reboot the doorbot
     time.sleep(5)
     os.system('sudo shutdown -r now')
