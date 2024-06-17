@@ -20,7 +20,7 @@ redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
 
 def signalHandler(sig, frame):
-    redis_cli('')
+    redis_cli.publish('doorswitch', 'stop')
 
 
 signal.signal(signal.SIGINT, signalHandler)
@@ -48,7 +48,7 @@ class DoorSwitch:
 
     def cancel(self):
         self.pi.cancel()
-        redis_cli.publish('doorlock','stop')
+        redis_cli.publish('doorswitch','stop')
 
 def main():
     pi = pigpio.pi()

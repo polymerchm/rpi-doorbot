@@ -46,6 +46,31 @@ for loop to wait for messages that represent incoming data.
 - watches for changs in amagnetic reed switches
 - logs the changes and timestamp to redis
 
+### Pinout for HAT  
+
+- Console TxD     GPIO15(8)
+- Console RxD     GPIO16(10)
+- Console GND     GND
+
+- Weigand 1       GPIO10 (19)
+- Weigand 2       GPIO09 (21)
+- Reader GND      GND
+- Reader LED      GPIO17 (11)
+- Reader Buzzer   GPIO18 (12)
+- Reader format   GPIO23 (16)
+- Door (relay)    GPIO22 (15)
+- reset button    GPIO03 (5)
+- door switch     GPIO24 (18)
+
+
+
+### Non-data external connections
+- door_switch_in, door_switch out (GND and pulled up data)
+- +12V
+- latch_in/latchout
+- console (3 pin header)
+
+
 
     
 

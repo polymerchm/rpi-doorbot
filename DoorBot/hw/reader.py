@@ -7,7 +7,7 @@ from hw.initializeRedis import initializeRedis
 from DoorBot.constants import *
 from time import sleep
 import signal, sys, os
-import jsonpickel
+import jsonpickle
 
 # Bodgery Raspberry Pi Zero 2 W Doorbot
 # reader daemon
@@ -28,7 +28,7 @@ def callback(bits, value):
         """
         if DEBUG:
             print(f"Weigand output: bits={bits}, value={value}")
-        redis_cli.publish('reader', jsonpickel.encode({'bits': bits, 'value': value}))
+        redis_cli.publish('reader', jsonpickle.encode({'bits': bits, 'value': value}))
 
 
 
@@ -64,7 +64,7 @@ def main():
             if data == 'stop': # stop the daemmon
                  break
             else:
-                data = jsonpickel.decode['data']
+                data = jsonpickle.decode['data']
                 bits = data['bits']
                 token = data['value']
 
