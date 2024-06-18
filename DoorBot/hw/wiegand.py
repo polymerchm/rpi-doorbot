@@ -161,15 +161,23 @@ if __name__ == "__main__":
    import time
 
    import pigpio
+   import DoorBot.Config as Config
 
-   import hw.wiegand as wiegand
+
 
    def callback(bits, value):
       print("bits={} value={}".format(bits, value))
 
    pi = pigpio.pi()
 
-   w = wiegand.decoder(pi, 14, 15, callback)
+   gpio = Config.get('gpio')
+   data0 = gpio['data0']
+   data1 = gpio['data1']
+
+   print("Start to decode")
+
+
+   w = decoder(pi, data0, data1,  callback)
 
    time.sleep(300) #collect data for 5 minutes
 
