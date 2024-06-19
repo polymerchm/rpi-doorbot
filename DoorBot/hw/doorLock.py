@@ -14,9 +14,6 @@ pubsub = redis_cli.pubsub()
 pubsub.subscribe(DOOR_LOCK)
 
 
-
-
-
 pi = pigpio.pi()
 lock = gpio['lock']
 
@@ -77,7 +74,8 @@ def main():
                 # open the lock and start a timer to close it using threading
                 openDoor()
                 delay = float(timing['lockOpenTime'])
-                print(f"Delay is {delay}")
+                if DEBUG:
+                    print(f"Delay is {delay}")
                 closer = threading.Timer(delay, triggerDoorClose)
                 closer.start()
             elif data == 'close' and lockState != 'closed':

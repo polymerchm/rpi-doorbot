@@ -8,7 +8,7 @@ redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe('reset')
 
-
+DEBUG = Config.get('debug')
 
 class Button:
     """
@@ -48,7 +48,10 @@ def resetDoorBot(button: Button):
     button.cancel()
     # reboot the doorbot
     time.sleep(5)
-    os.system('sudo shutdown -r now')
+    if DEBUG:
+        print("long press on reset occured")
+    else:
+        os.system('sudo shutdown -r now')
     
     
 

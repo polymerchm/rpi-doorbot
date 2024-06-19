@@ -2,6 +2,7 @@ from redis import Redis
 import jsonpickle
 import hw.wiegand as wiegand
 import DoorBot.Config as Config
+import hw.doorLock
 import pigpio
 from hw.initializeRedis import initializeRedis
 from DoorBot.constants import *
@@ -27,7 +28,7 @@ def callback(bits, value):
         receivevd data from the reader
         """
         if DEBUG:
-            print(f"Weigand output: bits={bits}, value={value}")
+            print(f"Weigand output: bits={bits}, value={value}, id={(value & 0x1ffffff) >> 1}")
         redis_cli.publish('reader', jsonpickle.encode({'bits': bits, 'value': value}))
 
 
@@ -65,13 +66,25 @@ def main():
                  break
             else:
                 data = jsonpickle.decode['data']
-                bits = data['bits']
-                token = data['value']
-
-                #check against the list of valid tokens
-                #if valid
-                #redis_cli.publish(DOOR_LOCK, 'open')
-                # if not there, chcek against the mms set
+                token = data['value'] # raw 26 bit Wiegand code
+                token &= 0x1ffffff # strip off upper parrity bit
+                token >>= 1 # shift off lower parity bit to generate 24 bit id
+                id = f"{token:010}"  # string padded out to 10 places with leading zeros
+                
+                position = redis_cli.lpos(FOB_LIST, id)
+                if position != None:
+                    # not in the local list,  go out to the server
+                    # ask the mss database about this id
+                    # if valid:
+                    #    if DEBUG:
+                    #       print("adding FOB id {id} to list and opening the door")
+                    #    redis_cli.lpush(FOB_LIST, id)
+                    #    redis_cli.publish(DOOR_LOCK, "open")
+                    pass
+                else:
+                    if DEBUG:
+                        print("Opening Door for ID {id}")
+                        redis_cli.publish(DOOR_LOCK, "open")
 
 
     w.cancel()

@@ -18,6 +18,9 @@ gpio = Config.get('gpio')
 DEBUG = Config.get('DEBUG')
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
+pubsub.subscribe("doorswitch")
+
+print("starting the program")
 
 def signalHandler(sig, frame):
     redis_cli.publish('doorswitch', 'stop')
@@ -41,6 +44,8 @@ class DoorSwitch:
         """
         triggered on a transition of the door switch 
         """
+        if DEBUG:
+            print("triggered - gpio {gpio}, level {level}")
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         door_is = 'open' if level == 0 else 'closed'
         self.callback(timestamp, door_is)
@@ -60,10 +65,11 @@ def main():
 
     lock = DoorSwitch(pi, switch, callback)
 
-
+    if DEBUG:
+        print("entering the for loop")
     for message in pubsub.listen():
         if DEBUG:
-            print(message)
+            print(f" the message is {message}")
         message_type = message['type']
         if message_type == 'subscribe':
             continue
@@ -75,10 +81,13 @@ def main():
                 lockdata = jsonpickle.decode(data)
                 timestamp = lockdata['timestamp']
                 state = lockdata['doorstate']
+                if DEBUG:
+                    print(f"Door Switch state={state}, timestamp={timestamp}")
                 redis_cli.lpush(DOOR_SWITCH_LOG,jsonpickle.encode({'doorstate': state, 'timestamp': timestamp}))  
 
     # exit for loop
-    pi.close()
+    print(f"exited the loop and fell through")
+    pi.stop()
     #exit
 
 if __name__ == '__main__':
