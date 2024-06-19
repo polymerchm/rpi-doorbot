@@ -1,7 +1,7 @@
 from redis import Redis
 from DoorBot.constants import  *
-from lastreboot import lastreboot
-from getserial import getserial
+from DoorBot.hw.lastreboot import lastreboot
+from DoorBot.hw.getserial import getserial
 
 def initializeRedis():
 

@@ -1,7 +1,7 @@
 import psutil
 import datetime
 
-def get():
+def lastreboot():
     """
     return text version of last reboot
     """
@@ -11,4 +11,4 @@ def get():
         .strftime("%Y-%m-%d %H:%M:%S")
 
 if __name__ == '__main__':
-    print(f"Last Reboot was {get()}")
+    print(f"Last Reboot was {lastreboot()}")

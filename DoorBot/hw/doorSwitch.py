@@ -60,6 +60,8 @@ def main():
     switch = gpio['switch']
 
     def callback(timestamp, switchState):
+        if DEBUG:
+            print(f" in doowSwitch callback, timestamp: {timestamp}, state: {switchState}")
         redis_cli.publish('doorswitch', jsonpickle.encode({'timestamp': timestamp, 'doorstate': switchState}))
 
 

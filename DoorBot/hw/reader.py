@@ -1,11 +1,13 @@
 from redis import Redis
 import jsonpickle
-import hw.wiegand as wiegand
-import DoorBot.Config as Config
-import hw.doorLock
-import pigpio
-from hw.initializeRedis import initializeRedis
 from DoorBot.constants import *
+import DoorBot.hw.wiegand as wiegand
+import DoorBot.Config as Config
+import DoorBot.hw.doorLock
+from DoorBot.hw.initializeRedis import initializeRedis
+import pigpio
+
+
 from time import sleep
 import signal, sys, os
 import jsonpickle
@@ -52,7 +54,7 @@ def main():
     timing = Config.get('timing')
     pi = pigpio.pi()
    
-    w = wiegand(pi, gpio['data0'], gpio['data1'], callback, timing['timeout'])
+    w = wiegand.decoder(pi, gpio['data0'], gpio['data1'], callback, timing['timeout'])
 
     for message in pubsub.listen():
         if DEBUG:

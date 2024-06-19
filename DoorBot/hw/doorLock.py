@@ -15,7 +15,7 @@ pubsub.subscribe(DOOR_LOCK)
 
 
 pi = pigpio.pi()
-lock = gpio['lock']
+lock = gpio['doorlock']
 
 pi.set_mode(lock, pigpio.OUTPUT)
 pi.set_pull_up_down(lock, pigpio.PUD_DOWN)
