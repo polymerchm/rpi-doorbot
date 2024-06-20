@@ -1,11 +1,15 @@
 from redis import Redis
 import jsonpickle
+import requests, json
+from requests.auth import HTTPDigestAuth
+from urllib.parse import urljoin, urlencode, urlparse, urlunparse
 from DoorBot.constants import *
 import DoorBot.hw.wiegand as wiegand
 import DoorBot.Config as Config
 import DoorBot.hw.doorLock
 from DoorBot.hw.initializeRedis import initializeRedis
 import pigpio
+
 
 
 from time import sleep
@@ -22,6 +26,11 @@ redis_cli = Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe('reader')
 
+#dump_keys_request = "https://rfid-prod.shop.thebodgery.org/secure/dump_active_tags";
+#check_key_request = "https://rfid-prod.shop.thebodgery.org/entry/";
+dump_keys_request = "https://rfid-dev.shop.thebodgery.org/secure/dump_active_tags";
+check_key_request = "https://rfid-dev.shop.thebodgery.org/entry/";
+
 def signalHandler(sig, frame):
     redis_cli.publish('reader', 'stop')
 
@@ -33,7 +42,8 @@ def callback(bits, value):
             print(f"Weigand output: bits={bits}, value={value}, id={(value & 0x1ffffff) >> 1}")
         redis_cli.publish('reader', jsonpickle.encode({'bits': bits, 'value': value}))
 
-
+def rebuild_id_cache():
+    pass
 
 def main():
     """
@@ -76,6 +86,13 @@ def main():
                 position = redis_cli.lpos(FOB_LIST, id)
                 if position != None:
                     # not in the local list,  go out to the server
+                    memberpress = Config.get('memberpress')
+                    user = memberpress['user']
+                    password = memberpress['password']
+                    base_url = memberpress['base_url']
+                    url = urljoin(base_url, 'tag' )
+                    result = requests.get(base_url, auth=HTTPDigestAuth(user, password), verify=True)
+                    
                     # ask the mss database about this id
                     # if valid:
                     #    if DEBUG:

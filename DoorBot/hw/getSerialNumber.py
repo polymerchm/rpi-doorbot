@@ -2,7 +2,7 @@
 get serial number from the chip
 """
 
-def getserial():
+def getSerialNumber():
   # Extract serial from cpuinfo file
   cpuserial = "0000000000000000"
   try:
@@ -17,4 +17,4 @@ def getserial():
   return cpuserial
 
 if __name__ == '__main__':
-  print(getserial())
+  print(getSerialNumber())

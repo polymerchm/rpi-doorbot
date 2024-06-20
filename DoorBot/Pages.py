@@ -11,7 +11,6 @@ def get_env():
     request = flask.request
     host_url = urlparse( request.base_url ) 
     hostname = host_url.hostname
-
     env = "personal"
     if "rfid-dev" in hostname:
         env = "dev"
@@ -19,7 +18,6 @@ def get_env():
         env = "stage"
     elif "rfid-prod" in hostname:
         env = "prod"
-
     return env
 
 def render_tmpl( name, **context ):

@@ -14,4 +14,5 @@ DOOR_STATE = 'door_state'
 DOOR_LOCK = 'door_lock'
 DOOR_SWITCH = 'door-switch'
 DOOR_SWITCH_LOG = 'door_switch_log'
+LOCATION = 'location'
 

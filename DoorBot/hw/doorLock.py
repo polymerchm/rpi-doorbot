@@ -22,17 +22,17 @@ pi.set_pull_up_down(lock, pigpio.PUD_DOWN)
 pi.write(lock,pigpio.LOW)
 
 
-def openDoor():
+def unlockDoor():
     if DEBUG:
         print("open lock request")
-    redis_cli.set(DOOR_STATE, 'opened')
+    redis_cli.set(DOOR_STATE, 'unlocked')
     pi.write(lock,pigpio.HIGH)
     
 
-def closeDoor():
+def lockDoor():
     if DEBUG:
         print("close lock request")
-    redis_cli.set(DOOR_STATE, 'closed')
+    redis_cli.set(DOOR_STATE, 'locked')
     pi.write(lock,pigpio.LOW)
 
 def signalHandler(sig, frame):
@@ -43,7 +43,7 @@ def signalHandler(sig, frame):
 def triggerDoorClose():
     if DEBUG:
         print("lock close triggered")
-    redis_cli.publish(DOOR_LOCK, 'close')
+    redis_cli.publish(DOOR_LOCK, 'lock')
 
 
 def main():
@@ -51,10 +51,10 @@ def main():
     use redis pubsub to react to lock state change request events.
 
     valid data:
-        'open' - 
-            if lock is not already open, open it and set state to open
-        'close' -
-            if lock is not already closed, close it and set state to closed
+        'unlock' - 
+            if lock is not already unlocked, unlock it and set state to unlocked
+        'lock' -
+            if lock is not already locked, lock it and set state to locked
         'stop'
             terminate the daemon cleanly
     """
@@ -70,26 +70,26 @@ def main():
         elif message['type'] == 'message':
             data = message['data'].decode("utf-8")
             lockState = redis_cli.get(DOOR_STATE)
-            if data == 'open' and lockState != 'opened':
+            if data == 'unlock' and lockState != 'unlocked':
                 # open the lock and start a timer to close it using threading
-                openDoor()
+                unlockDoor()
                 delay = float(timing['lockOpenTime'])
                 if DEBUG:
                     print(f"Delay is {delay}")
-                closer = threading.Timer(delay, triggerDoorClose)
-                closer.start()
-            elif data == 'close' and lockState != 'closed':
-                closeDoor()
+                relock = threading.Timer(delay, triggerDoorClose)
+                relock.start()
+            elif data == 'lock' and lockState != 'unlocked':
+                lockDoor()
             elif data == 'stop':
                 break
             else:
                 print("invalid message data")
 
 
-    print("lockLock daemon stopping")  
-    closeDoor()
-    redis_cli.set(DOOR_STATE, 'closed')
-    #pi.stop() 
+    print("Lock daemon stopping")  
+    lockDoor()
+    redis_cli.set(DOOR_STATE, 'locked')
+    pi.stop() 
 
 
 if __name__ == '__main__': 

@@ -34,3 +34,6 @@ timing:
   timeout: 5 # ms
   doorOpenTime: 30 # seconds
 
+location:
+   default
+

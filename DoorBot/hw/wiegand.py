@@ -27,53 +27,38 @@ class decoder:
             |  |
             20-100 ms interpulse gap  
  
- binary 0101
+ above is binary 0101
 
  data assummed to end after 26/32 bits or 10*100 ms (1 second) gap
  since last pulse
+
+ Data Format for 26 bits
+
+ PDDDDDDDDDDDDDDDDDDDDDDDDP
+
+ where P is a parity bit and D is the 24 bit ID number as on the tag face
  
  
- 
+ decoder:
    A class to read Wiegand codes of an arbitrary length.
 
    The code length and value are returned.
 
-   EXAMPLE
 
-   #!/usr/bin/env python
-
-   import time
-
-   import pigpio
-
-   import wiegand
-
-   def callback(bits, code):
-      print("bits={} code={}".format(bits, code))
-
-   pi = pigpio.pi()
-
-   w = wiegand.decoder(pi, 14, 15, callback)
-
-   time.sleep(300)
-
-   w.cancel()
-
-   pi.stop()
    """
 
    def __init__(self, pi, gpio_0, gpio_1, callback, bit_timeout=5):
 
       """
-      Instantiate with the pi, gpio for 0 (green wire), the gpio for 1
-      (white wire), the callback function, and the bit timeout in
+      Instantiate with the pi, gpio_0 for 0 (green wire), the gpio_1 for 1
+      (white wire), a callback function, and the bit timeout in
       milliseconds which indicates the end of a code.
       
       NB: the output of the reader is 0-5V.   Must be reduced to 3.3V to avoid
       smoking the micro.
 
       The callback is passed the code length in bits and the value.
-      _cb() is the low level callback when a trigger occurs on a pin
+      _cb() is the low level callback when a trigger occurs on a pin either via a transition or a timeout
       """
 
       self.pi = pi
