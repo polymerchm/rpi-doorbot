@@ -26,10 +26,12 @@ redis_cli = Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe('reader')
 
-#dump_keys_request = "https://rfid-prod.shop.thebodgery.org/secure/dump_active_tags";
-#check_key_request = "https://rfid-prod.shop.thebodgery.org/entry/";
-dump_keys_request = "https://rfid-dev.shop.thebodgery.org/secure/dump_active_tags";
-check_key_request = "https://rfid-dev.shop.thebodgery.org/entry/";
+server = Config.get('server')
+base_url = server['base_url']
+user = server['user']
+password = server['password']
+dump_keys_request = "secure/dump_active_tags"
+check_key_request = "entry/{}"
 
 def signalHandler(sig, frame):
     redis_cli.publish('reader', 'stop')
@@ -86,12 +88,12 @@ def main():
                 position = redis_cli.lpos(FOB_LIST, id)
                 if position != None:
                     # not in the local list,  go out to the server
-                    memberpress = Config.get('memberpress')
-                    user = memberpress['user']
-                    password = memberpress['password']
-                    base_url = memberpress['base_url']
-                    url = urljoin(base_url, 'tag' )
-                    result = requests.get(base_url, auth=HTTPDigestAuth(user, password), verify=True)
+                    server = Config.get('memserverberpress')
+                    user = server['user']
+                    password = server['password']
+                    base_url = server['base_url']
+                    url = base_url + check_key_request.format(id)
+                    result = requests.get(url, auth=HTTPDigestAuth(user, password), verify=True)
                     
                     # ask the mss database about this id
                     # if valid:

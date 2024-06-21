@@ -70,7 +70,11 @@ for loop to wait for messages that represent incoming data.
 - latch_in/latchout
 - console (3 pin header)
 
+API endpoints
 
+    .../check_tag/<tag>             check tag against the server
+    .../secure/dump_active_tags     get a json of all active tags 
+                                (id is the key, validty is a bool)
 
     
 
