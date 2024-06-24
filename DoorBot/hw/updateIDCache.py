@@ -40,12 +40,14 @@ def rebuildCache():
         for id,value in id_obj.items():
             if value:
                 redis_cli.lpush(FOB_LIST,id)
+            else:
+                print(id,value)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         redis_cli.set(LAST_FOB_LIST_REFRESH, timestamp)
 
 
 def signalHandler(sig, frame):
-    redis_cli.publish('cache_rebuild','stop')
+    redis_cli.publish(CACHE_REBUILD,'stop')
 
 
 def updateIDCache():

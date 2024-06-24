@@ -1,11 +1,14 @@
-from flask_stache import render_template
+from chevron import render 
 import flask
 from urllib.parse import urlparse
 from datetime import datetime
 import Config
 
 DEBUG = Config.get('DEBUG')
+template_path = 'templates'
 
+def render_template(name, args):
+    render(name, args, template_path)
 
 def get_env():
     request = flask.request
@@ -30,4 +33,5 @@ def render_tmpl( name, **context ):
     return render_template(
         name,
         **context,
+        'templates'
     )

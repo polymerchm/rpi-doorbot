@@ -34,7 +34,7 @@ dump_keys_request = "secure/dump_active_tags"
 check_key_request = "entry/{}"
 
 def signalHandler(sig, frame):
-    redis_cli.publish('reader', 'stop')
+    redis_cli.publish(READER, 'stop')
 
 def callback(bits, value):  
         """
@@ -42,7 +42,7 @@ def callback(bits, value):
         """
         if DEBUG:
             print(f"Weigand output: bits={bits}, value={value}, id={(value & 0x1ffffff) >> 1}")
-        redis_cli.publish('reader', jsonpickle.encode({'bits': bits, 'value': value}))
+        redis_cli.publish(READER, jsonpickle.encode({'bits': bits, 'value': value}))
 
 def rebuild_id_cache():
     pass

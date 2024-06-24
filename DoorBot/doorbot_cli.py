@@ -68,9 +68,9 @@ def main():
     match vars(args):    
         #actions
         case {'lock':True}:
-            redis_cli.publish('lock')
+            redis_cli.publish(DOOR_LOCK,'lock')
         case {'unlock':True}:
-            redis_cli.publish('unlock')
+            redis_cli.publish(DOOR_LOCK,'unlock')
         case {'stop_all':True}:
             shutDown()
         case {'restart':True}:

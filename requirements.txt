@@ -8,6 +8,7 @@ bleach==6.1.0
 blinker==1.8.2
 certifi==2024.2.2
 charset-normalizer==3.3.2
+chevron==0.14.0
 click==8.1.7
 decorator==5.1.1
 defusedxml==0.7.1
@@ -15,7 +16,8 @@ docopt==0.6.2
 executing==2.0.1
 fastjsonschema==2.19.1
 Flask==3.0.3
-Flask-Stache==0.1.1
+Flask-Cors==4.0.1
+Flask-HTTPAuth==4.8.0
 gunicorn==22.0.0
 idna==3.7
 importlib_metadata==7.1.0
@@ -48,7 +50,6 @@ psutil==5.9.8
 ptyprocess==0.7.0
 pure-eval==0.2.2
 Pygments==2.18.0
-pystache==0.6.5
 python-dateutil==2.9.0.post0
 PyYAML==6.0.1
 pyzmq==26.0.3

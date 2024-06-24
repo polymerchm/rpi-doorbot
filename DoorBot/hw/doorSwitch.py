@@ -23,7 +23,7 @@ pubsub.subscribe("doorswitch")
 print("starting the program")
 
 def signalHandler(sig, frame):
-    redis_cli.publish('doorswitch', 'stop')
+    redis_cli.publish(DOOR_SWITCH, 'stop')
 
 
 signal.signal(signal.SIGINT, signalHandler)
@@ -53,7 +53,7 @@ class DoorSwitch:
 
     def cancel(self):
         self.pi.cancel()
-        redis_cli.publish('doorswitch','stop')
+        redis_cli.publish(DOOR_SWITCH,'stop')
 
 def main():
     pi = pigpio.pi()
@@ -62,7 +62,7 @@ def main():
     def callback(timestamp, switchState):
         if DEBUG:
             print(f" in doowSwitch callback, timestamp: {timestamp}, state: {switchState}")
-        redis_cli.publish('doorswitch', jsonpickle.encode({'timestamp': timestamp, 'doorstate': switchState}))
+        redis_cli.publish(DOOR_SWITCH, jsonpickle.encode({'timestamp': timestamp, 'doorstate': switchState}))
 
 
     lock = DoorSwitch(pi, switch, callback)

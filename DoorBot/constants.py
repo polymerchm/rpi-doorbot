@@ -15,4 +15,7 @@ DOOR_LOCK = 'door_lock'
 DOOR_SWITCH = 'door-switch'
 DOOR_SWITCH_LOG = 'door_switch_log'
 LOCATION = 'location'
+READER = 'reader'
+CACHE_REBUILD = 'cache_rebuild'
+RESET_BUTTON = 'reset_button'
 

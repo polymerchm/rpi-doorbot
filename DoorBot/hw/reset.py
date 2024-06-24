@@ -35,7 +35,7 @@ class Button:
     def _cb(self, pin, level, tick):
         if level == pigpio.TIMEOUT:
             self.pi.set_watchdog(self.pin, 0)
-            redis_cli.publish('reset', 'do_reset')
+            redis_cli.publish(RESET_BUTTON, 'do_reset')
         else:
             self.pi.set_watchdog(self.pin, self.long)
     
