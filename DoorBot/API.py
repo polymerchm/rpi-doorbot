@@ -26,7 +26,7 @@ def render_template(name, args):
     render(name, args, template_path)
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_url_path='/static')
 
 app = create_app()
 CORS(app)

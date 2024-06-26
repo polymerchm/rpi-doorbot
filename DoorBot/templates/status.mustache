@@ -1,18 +1,22 @@
-{{>header}}
-
 {{! Display Current Status }}
 
-{{bot_data}}
+{{> bot_data}}
 
-{{#locked}}
-{{/locked}}
-{{^locked}}
-{{locked}}
+{{# locked}}
+<P>I'm locked</p>
+{{/ locked}}
 
-{{#open}}
-{{/open}}
-{{^open}}
-{{open}}
+{{^ locked}}
+<P>I'm unlocked</p>
+{{/ locked}}
+
+{{# open}}
+<P>I'm opened</p>
+{{/ open}}
+
+{{^ open}}
+<P>I'm closed</p>
+{{ open}}
 
 
 {{! Buttons (as switches) for Lock and Unlock }}
@@ -20,6 +24,3 @@
 {{! Button to restart the doorbot system }}
 
 {{! Button to reboot the doorbot }}
-
-
-{{>footer}}
