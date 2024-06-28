@@ -9,29 +9,33 @@ allows interogation of the DoorBot and remotely unlocking it
 from redis import Redis
 from flask import Flask, request, jsonify, Response
 import sys, signal, os
-import Config
+import DoorBot.Config as Config
 from flask import Flask, request, jsonify, abort, render_template, Response
 from flask_cors import CORS, cross_origin
 from flask_httpauth import HTTPBasicAuth
 from DoorBot.constants import *
-from chevron import render 
+from flask_stache import render_template
+
 
 DEBUG = Config.get('DEBUG')
 
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-template_path = 'templates'
 
-def render_template(name, args):
-    render(name, args, template_path)
+
 
 def create_app():
-    app = Flask(__name__, static_url_path='/static')
+    app = Flask(__name__, static_url_path='/static', template_folder=os.path.join(ROOT_PATH,'templates'))
+    return app
 
 app = create_app()
 CORS(app)
 
 redis_cli = Redis()
+
+def redisGet(key: str, default:any="unset") -> any:
+    result = redis_cli.get(key)
+    return result if result != None else default
 
 
 @app.route('/unlock', methods=['POST'])
@@ -46,16 +50,17 @@ def lock():
 @app.route('/status', methods=['GET'])
 def status():
     args = {
-            'door':redis_cli.get(DOOR_STATE), 
-            'lock':redis_cli.get(DOOR_LOCK),
-            'location':redis_cli.get(LOCATION),
-            'serialnumber':redis_cli.get(SERIAL_NUMBER),
+            'door': redisGet(DOOR_STATE,), 
+            'lock': redisGet(DOOR_LOCK),
+            'open': "this is hte open text",
+            'location':redisGet(LOCATION),
+            'serialnumber':redisGet(SERIAL_NUMBER),
             'cachesize':redis_cli.llen(FOB_LIST),
-            'lastrefresh':redis_cli.get(LAST_FOB_LIST_REFRESH),
-            'lastreboot':redis_cli.get(REBOOT_TIME)
+            'lastrefresh':redisGet(LAST_FOB_LIST_REFRESH),
+            'lastreboot':redisGet(REBOOT_TIME),
+            'showbuttons':True
     }
-
-    return render_template('status', args)
+    return render_template('index', **args)
 
 
 
