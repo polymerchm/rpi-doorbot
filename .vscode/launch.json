@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+
+        {
+            "name": "doorSwitch",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.doorSwitch"
+        },
+        {
+            "name": "reset",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.reset"
+        },
+        {
+            "name": "updataIDCache",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.updateIDCache"
+        },
+        {
+            "name": "Python: API",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/venv/bin/gunicorn",
+            "gevent": true,
+            "args": [
+                "DoorBot.API:app",
+                "--bind=0.0.0.0:5000",
+                "--reload",
+                "--worker-class",
+                "eventlet",
+                "-w",
+                "1",
+                "--timeout=7200"
+            ],
+            "justMyCode": false
+            // "postDebugTask": "killdebugger"
+        },
+    ]
+}
