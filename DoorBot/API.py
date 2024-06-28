@@ -21,9 +21,6 @@ DEBUG = Config.get('DEBUG')
 
 ROOT_PATH = os.path.abspath(os.path.dirname(__file__))
 
-
-
-
 def create_app():
     app = Flask(__name__, static_url_path='/static', template_folder=os.path.join(ROOT_PATH,'templates'))
     return app
@@ -50,15 +47,13 @@ def lock():
 @app.route('/status', methods=['GET'])
 def status():
     args = {
-            'door': redisGet(DOOR_STATE,), 
+            'door': redisGet(DOOR_STATE), 
             'lock': redisGet(DOOR_LOCK),
-            'open': "this is hte open text",
             'location':redisGet(LOCATION),
             'serialnumber':redisGet(SERIAL_NUMBER),
             'cachesize':redis_cli.llen(FOB_LIST),
             'lastrefresh':redisGet(LAST_FOB_LIST_REFRESH),
             'lastreboot':redisGet(REBOOT_TIME),
-            'showbuttons':True
     }
     return render_template('index', **args)
 

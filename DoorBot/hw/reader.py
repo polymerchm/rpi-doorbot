@@ -1,7 +1,17 @@
+"""
+
+Main Daemon:
+
+Monitors the reader and then checks for teh validity of the 
+fob id, either against the cache or by polling the server.add()
+
+If the ID is valid, send a message via redis doorlock channel to energize the door lock
+
+"""
 from redis import Redis
 import jsonpickle
 import requests, json
-from requests.auth import HTTPDigestAuth
+# from requests.auth import HTTPDigestAuth
 from urllib.parse import urljoin, urlencode, urlparse, urlunparse
 from DoorBot.constants import *
 import DoorBot.hw.wiegand as wiegand
@@ -31,7 +41,9 @@ base_url = server['base_url']
 user = server['user']
 password = server['password']
 dump_keys_request = "secure/dump_active_tags"
-check_key_request = "entry/{}"
+check_key_request = "v1/entry/{}/{}"
+
+location = redis_cli.get(LOCATION).decode("utf-8")
 
 def signalHandler(sig, frame):
     redis_cli.publish(READER, 'stop')
@@ -79,33 +91,34 @@ def main():
             if data == 'stop': # stop the daemmon
                  break
             else:
-                data = jsonpickle.decode['data']
+                data = jsonpickle.decode(data)
                 token = data['value'] # raw 26 bit Wiegand code
                 token &= 0x1ffffff # strip off upper parrity bit
                 token >>= 1 # shift off lower parity bit to generate 24 bit id
                 id = f"{token:010}"  # string padded out to 10 places with leading zeros
                 
                 position = redis_cli.lpos(FOB_LIST, id)
-                if position != None:
+                if DEBUG:
+                    print(f"Position of {id} is {position} in list")
+                if position == None:
                     # not in the local list,  go out to the server
-                    server = Config.get('memserverberpress')
+                    server = Config.get('server')
                     user = server['user']
                     password = server['password']
                     base_url = server['base_url']
-                    url = base_url + check_key_request.format(id)
-                    result = requests.get(url, auth=HTTPDigestAuth(user, password), verify=True)
-                    
-                    # ask the mss database about this id
-                    # if valid:
-                    #    if DEBUG:
-                    #       print("adding FOB id {id} to list and opening the door")
-                    #    redis_cli.lpush(FOB_LIST, id)
-                    #    redis_cli.publish(DOOR_LOCK, "open")
-                    pass
-                else:
-                    if DEBUG:
-                        print("Opening Door for ID {id}")
+                    url = base_url + check_key_request.format(id,location)
+                    result = requests.get(url, auth=(user, password))
+                    if result.status_code != 200:
+                        if DEBUG:
+                            print(f"Did not recognize gon {id}") 
+                    else:
+                        if DEBUG:
+                          print(f"recognizing FOB id {id}")
                         redis_cli.publish(DOOR_LOCK, "open")
+                else: # it is a valid id
+                    if DEBUG:
+                        print(f"recognizing FOB id {id}")
+                    redis_cli.publish(DOOR_LOCK, "open")
 
 
     w.cancel()

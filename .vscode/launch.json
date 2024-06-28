@@ -6,6 +6,8 @@
     "configurations": [
 
 
+
+
         {
             "name": "doorSwitch",
             "type": "debugpy",
@@ -25,7 +27,20 @@
             "module": "DoorBot.hw.updateIDCache"
         },
         {
-            "name": "Python: API",
+            "name": "reader",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.reader"
+        },
+        {
+            "name": "intiRedis",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.initializeRedis"
+        },
+        
+        {
+            "name": "API",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/venv/bin/gunicorn",

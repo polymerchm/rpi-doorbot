@@ -1,7 +1,12 @@
+"""
+
+return last reboot datetime as a string
+
+"""
 import psutil
 import datetime
 
-def lastreboot():
+def lastreboot()->str:
     """
     return text version of last reboot
     """

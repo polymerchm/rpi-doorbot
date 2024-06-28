@@ -21,13 +21,14 @@ server = Config.get('server')
 user = server['user']
 password = server['password']
 base_url = server['base_url']
-url = base_url + '/secure/dump_active_tags'
+url = base_url + 'secure/dump_active_tags'
 
 
 def rebuildCache():
     
     #get the current list from the server
     auth = (user, password)
+    print(url)
     results = requests.get(url, auth=auth)
     if results.status_code != 200:
     # test that it is good, else print an error message to the log and return

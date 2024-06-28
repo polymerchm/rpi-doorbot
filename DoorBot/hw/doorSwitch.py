@@ -2,7 +2,7 @@
 monitors the magnetic door switch and reports back to redis (or elsewhere) 
 timestamped changes
 
-switch is connected between 3.3v and ground. 
+switch is connected between the approriate pin (pulled up) and ground. 
 """
 import redis
 import pigpio
