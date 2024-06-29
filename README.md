@@ -30,8 +30,8 @@ for loop to wait for messages that represent incoming data.
 ### reader.py
 
 - pigpio library for **ISR** (needs the pigpio daemon running)
-- reads Weigand codes (dat0, dat1, trigger)
-        trigger is falling edge on either Data 0 or Data 1
+- reads Weigand codes (dat0, dat1)
+        trigger is falling edge on either dat0 or dat1
 - daemon pushes last legal keycode to redis
     
 
