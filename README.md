@@ -2,27 +2,26 @@
 
 ## basic concepts
 
-The thee daemon, **reader**, **doorlock**, and **doorswitch** use redis pubsub.listen() in a 
+A set of  5 daemons use redis pubsub.listen() in a 
 for loop to wait for messages that represent incoming data.  
 
-64-bit Raspian
+64-bit Raspian is needed for VSCode to work for remote editing/debugging
 
 ### redis for state management
 - holds time of last reboot
 - holds a list a valid keyfobs
 - hold time of last fob list refresh
-- holds type of role
-- holds role object info
 - holds serial number info for RPI
-- holds list of last valid keyfob codes
-- holds list of most recent invalid keyfob codes
-- hold value of read keycode and timestamp or ""
 - hold the time of the last reboot
-    
+- redis pubsub capabilty used for interprocess communication   
+
 ---
+
+## Daemons
+
 ### Flask based api
 
-- mimics esp32-doorbot api for calls to MMS to get user info
+- mimics esp32-doorbot api for calls to doorbot server to get user info
 - mustache-based user interface w/ admin password
     for local control
 - provides status and other info
@@ -30,11 +29,11 @@ for loop to wait for messages that represent incoming data.
 
 ### reader.py
 
-- pigpio library for **ISR** (may need the pigpio daemon running)
-- daemon that reads Weigand codes (dat0, dat1, trigger)
-        trigger is the output of an XOR gate of Dat0 and Dat1
+- pigpio library for **ISR** (needs the pigpio daemon running)
+- reads Weigand codes (dat0, dat1, trigger)
+        trigger is falling edge on either Data 0 or Data 1
 - daemon pushes last legal keycode to redis
-    daemon toggles LED and buzzer
+    
 
 ### doorLock.py
 
@@ -43,8 +42,20 @@ for loop to wait for messages that represent incoming data.
 
 ### doorSwitch.py
 
-- watches for changs in amagnetic reed switches
+- watches for changes in amagnetic reed switches
 - logs the changes and timestamp to redis
+
+### updateIDCache.py
+
+- at designated interval, refreshed local ID tab list on redis
+
+---
+
+### initializeRedis.py
+
+- set redis into its base state
+
+---
 
 ### Pinout for HAT  
 
@@ -72,9 +83,17 @@ for loop to wait for messages that represent incoming data.
 
 API endpoints
 
-    .../check_tag/<tag>             check tag against the server
-    .../secure/dump_active_tags     get a json of all active tags 
-                                (id is the key, validty is a bool)
+    ...v1/check_tag/<tag>/<location>    check tag against the server 
+    .../secure/dump_active_tags         get a json of all active tags 
+                                        (id is the key, validty is a bool)
 
-    
+Current Valid Locations are
+
+  - cleanroom.door
+  - garage.door
+  - woodshop.door
+  - dummy
+  - front.door
+  - back_main.door
+  - back_annex.door
 

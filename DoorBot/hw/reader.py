@@ -11,12 +11,9 @@ If the ID is valid, send a message via redis doorlock channel to energize the do
 from redis import Redis
 import jsonpickle
 import requests, json
-# from requests.auth import HTTPDigestAuth
-from urllib.parse import urljoin, urlencode, urlparse, urlunparse
 from DoorBot.constants import *
 import DoorBot.hw.wiegand as wiegand
 import DoorBot.Config as Config
-import DoorBot.hw.doorLock
 from DoorBot.hw.initializeRedis import initializeRedis
 import pigpio
 
