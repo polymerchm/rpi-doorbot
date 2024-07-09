@@ -31,7 +31,7 @@ import jsonpickle
 DEBUG = Config.get('DEBUG')
 redis_cli = Redis()
 pubsub = redis_cli.pubsub()
-pubsub.subscribe('reader')
+pubsub.subscribe(READER_CHANNEL)
 
 server = Config.get('server')
 base_url = server['base_url']
@@ -43,7 +43,7 @@ check_key_request = "v1/entry/{}/{}"
 location = redis_cli.get(LOCATION).decode("utf-8")
 
 def signalHandler(sig, frame):
-    redis_cli.publish(READER, 'stop')
+    redis_cli.publish(READER_CHANNEL, 'stop')
 
 def callback(bits, value):  
         """
@@ -51,7 +51,7 @@ def callback(bits, value):
         """
         if DEBUG:
             print(f"Weigand output: bits={bits}, value={value}, id={(value & 0x1ffffff) >> 1}")
-        redis_cli.publish(READER, jsonpickle.encode({'bits': bits, 'value': value}))
+        redis_cli.publish(READER_CHANNEL, jsonpickle.encode({'bits': bits, 'value': value}))
 
 def rebuild_id_cache():
     pass
@@ -107,15 +107,15 @@ def main():
                     result = requests.get(url, auth=(user, password))
                     if result.status_code != 200:
                         if DEBUG:
-                            print(f"Did not recognize gon {id}") 
+                            print(f"Did not recognize fob {id}") 
                     else:
                         if DEBUG:
                           print(f"recognizing FOB id {id}")
-                        redis_cli.publish(DOOR_LOCK, "open")
+                        redis_cli.publish(DOOR_LOCK_CHANNEL, "unlock")
                 else: # it is a valid id
                     if DEBUG:
                         print(f"recognizing FOB id {id}")
-                    redis_cli.publish(DOOR_LOCK, "open")
+                    redis_cli.publish(DOOR_LOCK_CHANNEL, "unlock")
 
 
     w.cancel()

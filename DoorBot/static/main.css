@@ -1,0 +1,141 @@
+:root {
+    /* Color scheme:
+    * https://paletton.com/#uid=13C0u0kepl76tuIa-pnhmgimLdJ
+    */
+    --color-primary: #d6d8dc;
+    --color-secondary: #1a232d;
+    --color-tertiary: #0f16e6;
+    --color-quaternary: #e80606;
+}
+
+
+body {
+    background-color: var(--color-primary);
+    color: var(--color-secondary);
+}
+
+
+a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:link {
+    color: var(--color-secondary);
+}
+
+a:visited {
+    color: var(--color-secondary);
+}
+
+a:hover {
+    color: var(--color-tertiary);
+}
+
+a:active {
+    color: var(--color-tertiary);
+}
+
+
+.menu {
+    list-style-type: "⇨ ";
+}
+
+#error_list {
+    color: red;
+}
+
+.lower_env_banner {
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.env_personal {
+    background-color: red;
+}
+
+.env_dev {
+    background-color: red;
+}
+
+.env_stage {
+    background-color: yellow;
+}
+
+.env_prod {
+    display: hidden;
+}
+
+.activate_button {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+
+    color: var(--color-secondary);
+    background-color: var(--color-primary);
+
+    border: 0px;
+
+    font-weight: bold;
+    font-size: medium;
+}
+
+.activate_button:hover {
+    color: var(--color-tertiary);
+    cursor: pointer;
+}
+
+.activate_form {
+    margin-bottom: 0px;
+}
+
+table {
+    border: 0px;
+}
+
+th,
+td {
+    border: 1pxsolidvar(--color-quaternary);
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+th {
+    color: var(--color-secondary);
+}
+
+td {
+    color: var(--color-secondary);
+}
+
+.image_size {
+
+    @media (min-width: 150px) {
+        max-width: 150px;
+    }
+
+    @media (min-width: 300px) {
+        max-width: 300px;
+    }
+
+    @media (min-width: 800px) {
+        max-width: 800px;
+    }
+}
+
+.status_list {
+    background-color: green;
+}
+
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.center_text {
+    text-align: center
+}

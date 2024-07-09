@@ -15,7 +15,7 @@ a signal via redis pubsub will stop the timer and end the process
 
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
-pubsub.subscribe('cache_rebuild')
+pubsub.subscribe(CACHE_REBUILD_CHANNEL)
 
 server = Config.get('server')
 user = server['user']
@@ -48,7 +48,7 @@ def rebuildCache():
 
 
 def signalHandler(sig, frame):
-    redis_cli.publish(CACHE_REBUILD,'stop')
+    redis_cli.publish(CACHE_REBUILD_CHANNEL,'stop')
 
 
 def updateIDCache():

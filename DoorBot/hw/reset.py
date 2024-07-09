@@ -1,4 +1,5 @@
 from  DoorBot.shutdownAll import shutDown
+from DoorBot.constants import *
 import os, time
 import pigpio
 import redis
@@ -6,7 +7,7 @@ import DoorBot.Config as Config
 
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
-pubsub.subscribe('reset')
+pubsub.subscribe(RESET_BUTTON_CHANNEL)
 
 DEBUG = Config.get('DEBUG')
 
@@ -35,7 +36,7 @@ class Button:
     def _cb(self, pin, level, tick):
         if level == pigpio.TIMEOUT:
             self.pi.set_watchdog(self.pin, 0)
-            redis_cli.publish(RESET_BUTTON, 'do_reset')
+            redis_cli.publish(RESET_BUTTON_CHANNEL, 'do_reset')
         else:
             self.pi.set_watchdog(self.pin, self.long)
     

@@ -20,7 +20,7 @@ gpio = Config.get('gpio')
 DEBUG = Config.get('DEBUG')
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
-pubsub.subscribe(DOOR_LOCK)
+pubsub.subscribe(DOOR_LOCK_CHANNEL)
 
 
 pi = pigpio.pi()
@@ -47,12 +47,12 @@ def lockDoor():
 def signalHandler(sig, frame):
     if DEBUG:
         print(f"stop requested via sigterm or sigint {sig}")
-    redis_cli.publish(DOOR_LOCK,'stop')
+    redis_cli.publish(DOOR_LOCK_CHANNEL,'stop')
 
 def triggerDoorClose():
     if DEBUG:
         print("lock close triggered")
-    redis_cli.publish(DOOR_LOCK, 'lock')
+    redis_cli.publish(DOOR_LOCK_CHANNEL, 'lock')
 
 
 def main():
