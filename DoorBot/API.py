@@ -34,30 +34,30 @@ def redisGet(key: str, default:any="unset") -> any:
     result = redis_cli.get(key)
     return result if result != None else default
 
-@app.route('/toggleLock', methods['POST'])
+@app.route('/toggleLock', methods=['POST'])
 def toggleLock():
     lockState = redisGet(DOOR_STATE)
     if lockState == 'locked':
-        redis_cli.publish(DOOR_LOCK,'unlock')
+        redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
     else:
-        redis_cli.publish(DOOR_LOCK, 'lock')
+        redis_cli.publish(DOOR_LOCK_CHANNEL, 'lock')
 
 
 
 @app.route('/unlock', methods=['POST'])
 def unlock():
-    redis_cli.publish(DOOR_LOCK,'unlock')
+    redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
 
 @app.route('/lock', methods=['POST'])
 def lock():
-    redis_cli.publish(DOOR_LOCK,'lock')
+    redis_cli.publish(DOOR_LOCK_CHANNEL,'lock')
 
 @app.route('/', methods=['GET'])
 @app.route('/status', methods=['GET'])
 def status():
     args = {
             'doorState': redisGet(DOOR_STATE), 
-            'lockState': redisGet(, 
+            'lockState': redisGet(LOCK_STATE), 
             'location':redisGet(LOCATION),
             'serialnumber':redisGet(SERIAL_NUMBER),
             'cachesize':redis_cli.llen(FOB_LIST),
