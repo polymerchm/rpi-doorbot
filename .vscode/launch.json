@@ -8,11 +8,18 @@
 
 
 
+
         {
             "name": "doorSwitch",
             "type": "debugpy",
             "request": "launch",
             "module": "DoorBot.hw.doorSwitch"
+        },
+        {
+            "name": "doorLock",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.doorLock"
         },
         {
             "name": "reset",

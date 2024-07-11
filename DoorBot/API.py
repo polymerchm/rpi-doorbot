@@ -15,6 +15,7 @@ from flask_cors import CORS, cross_origin
 from flask_httpauth import HTTPBasicAuth
 from DoorBot.constants import *
 from flask_stache import render_template
+from time import sleep
 
 
 DEBUG = Config.get('DEBUG')
@@ -34,19 +35,24 @@ def redisGet(key: str, default:any="unset") -> any:
     result = redis_cli.get(key)
     return result if result != None else default
 
-@app.route('/toggleLock', methods=['POST'])
+@app.route('/toggleLock', methods=['GET'])
 def toggleLock():
-    lockState = redisGet(DOOR_STATE)
+    lockState = redisGet(DOOR_STATE).decode("utf-8")
     if lockState == 'locked':
         redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
     else:
         redis_cli.publish(DOOR_LOCK_CHANNEL, 'lock')
+    sleep(0.05)
+    return status()
+
+
 
 
 
 @app.route('/unlock', methods=['POST'])
 def unlock():
     redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
+
 
 @app.route('/lock', methods=['POST'])
 def lock():

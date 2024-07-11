@@ -85,6 +85,7 @@ def main():
                 state = lockdata['doorstate']
                 if DEBUG:
                     print(f"Door Switch state={state}, timestamp={timestamp}")
+                redis_cli.set(DOOR_STATE,state)
                 redis_cli.lpush(DOOR_SWITCH_LOG,jsonpickle.encode({'doorstate': state, 'timestamp': timestamp}))  
 
     # exit for loop

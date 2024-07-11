@@ -1,14 +1,13 @@
 <div class="actions center" >
     <dl>
         <dt>The Door is </dt>
-        <dd>{{doorState}}<dd>
+        <dd id="doorstate">{{doorState}}<dd>
         <dt>The Lock is </dt>
-        <dd>{{lockState}}</dd>
+        <dd id="lockstate">{{lockState}}</dd>
     </dl>
 
-    <form action="/toggleLock">
-        <label>Toggle Lock</label>
-        <input type="button" style="width: 20%;">
+    <form action="/toggleLock"> 
+        <button id="togglebutton" type="submit">Toggle Lock</button>
     </form>
  </div>
 

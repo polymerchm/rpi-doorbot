@@ -78,7 +78,7 @@ def main():
             continue
         elif message['type'] == 'message':
             data = message['data'].decode("utf-8")
-            lockState = redis_cli.get(DOOR_STATE)
+            lockState = redis_cli.get(DOOR_STATE).decode("utf-8")
             if data == 'unlock' and lockState != 'unlocked':
                 # open the lock and start a timer to close it using threading
                 unlockDoor()
@@ -87,7 +87,7 @@ def main():
                     print(f"Delay is {delay}")
                 relock = threading.Timer(delay, triggerDoorClose)
                 relock.start()
-            elif data == 'lock' and lockState != 'unlocked':
+            elif data == 'lock' and lockState != 'locked':
                 lockDoor()
             elif data == 'stop':
                 break

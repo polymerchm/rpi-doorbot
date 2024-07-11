@@ -32,7 +32,7 @@ memberpress:
 
 timing:
   timeout: 5 # ms
-  doorOpenTime: 30 # seconds
+  lockOpenTime: 30 # seconds
 
 location:
    default

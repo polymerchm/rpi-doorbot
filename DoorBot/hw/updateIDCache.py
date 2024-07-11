@@ -1,11 +1,12 @@
 import redis
 import DoorBot.Config as Config
 from DoorBot.constants import *
-import threading
+from threading import Timer
 from datetime import datetime
 import requests
 import json
 import signal
+import sys
 
 """
 at approriate intervals, update the ID cacahe in Redis 
@@ -23,13 +24,21 @@ password = server['password']
 base_url = server['base_url']
 url = base_url + 'secure/dump_active_tags'
 
+class RepeatTimer(Timer):
+    def run(self):
+        while not self.finished.wait(self.interval):
+            self.function(*self.args, **self.kwargs)
 
 def rebuildCache():
     
     #get the current list from the server
     auth = (user, password)
     print(url)
-    results = requests.get(url, auth=auth)
+    try:
+        results = requests.get(url, auth=auth, verify=False)
+    except:
+        print("requeat failed")
+        sys.exit(1)
     if results.status_code != 200:
     # test that it is good, else print an error message to the log and return
         print("Could not retreive id object")
@@ -60,8 +69,9 @@ def updateIDCache():
     signal.signal(signal.SIGTERM, signalHandler)
     # initiate the timer thread here
     rebuild_cache_interval = Config.get('timing')['rebuildCacheInterval']
-    timer = threading.Timer(rebuild_cache_interval, rebuildCache)
+    timer = RepeatTimer(rebuild_cache_interval, rebuildCache)
     timer.start()
+
     #perform initial rebuild
     rebuildCache()
 

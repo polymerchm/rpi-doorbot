@@ -104,7 +104,11 @@ def main():
                     password = server['password']
                     base_url = server['base_url']
                     url = base_url + check_key_request.format(id,location)
-                    result = requests.get(url, auth=(user, password))
+                    try:    
+                        result = requests.get(url, auth=(user, password), verify=False)
+                    except:
+                        print("request failed")
+                        sys.exit(1)
                     if result.status_code != 200:
                         if DEBUG:
                             print(f"Did not recognize fob {id}") 
