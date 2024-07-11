@@ -105,7 +105,7 @@ def main():
                     base_url = server['base_url']
                     url = base_url + check_key_request.format(id,location)
                     try:    
-                        result = requests.get(url, auth=(user, password), verify=False)
+                        result = requests.get(url, auth=(user, password))
                     except:
                         print("request failed")
                         sys.exit(1)

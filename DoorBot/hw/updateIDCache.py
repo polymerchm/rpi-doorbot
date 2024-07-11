@@ -35,7 +35,7 @@ def rebuildCache():
     auth = (user, password)
     print(url)
     try:
-        results = requests.get(url, auth=auth, verify=False)
+        results = requests.get(url, auth=auth)
     except:
         print("requeat failed")
         sys.exit(1)
