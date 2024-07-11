@@ -1,7 +1,21 @@
+<script>
+    var timer = setInterval( function() {
+    $.get('/getStatus', function (data) {
+        results = JSON.parse(data)
+        var doorState =  $('#doorstate')
+        var lockState = $('#lockstate')
+        $('#doorstate').html(results.doorState)
+        $('#lockstate').html(results.lockState)
+    })   
+    }, 1000)
+
+    
+</script>
+    
 <div class="actions center" >
     <dl>
         <dt>The Door is </dt>
-        <dd id="doorstate">{{doorState}}<dd>
+        <dd id="doorstate">{{doorState}}</dd>
         <dt>The Lock is </dt>
         <dd id="lockstate">{{lockState}}</dd>
     </dl>

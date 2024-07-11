@@ -34,14 +34,14 @@ pi.write(lock,pigpio.LOW)
 def unlockDoor():
     if DEBUG:
         print("open lock request")
-    redis_cli.set(DOOR_STATE, 'unlocked')
+    redis_cli.set(LOCK_STATE, 'unlocked')
     pi.write(lock,pigpio.HIGH)
     
 
 def lockDoor():
     if DEBUG:
         print("close lock request")
-    redis_cli.set(DOOR_STATE, 'locked')
+    redis_cli.set(LOCK_STATE, 'locked')
     pi.write(lock,pigpio.LOW)
 
 def signalHandler(sig, frame):
@@ -97,7 +97,7 @@ def main():
 
     print("Lock daemon stopping")  
     lockDoor()
-    redis_cli.set(DOOR_STATE, 'locked')
+    redis_cli.set(LOCK_STATE, 'locked')
     pi.stop() 
 
 

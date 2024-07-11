@@ -16,6 +16,8 @@ from flask_httpauth import HTTPBasicAuth
 from DoorBot.constants import *
 from flask_stache import render_template
 from time import sleep
+import json
+
 
 
 DEBUG = Config.get('DEBUG')
@@ -37,7 +39,7 @@ def redisGet(key: str, default:any="unset") -> any:
 
 @app.route('/toggleLock', methods=['GET'])
 def toggleLock():
-    lockState = redisGet(DOOR_STATE).decode("utf-8")
+    lockState = redisGet(LOCK_STATE).decode("utf-8")
     if lockState == 'locked':
         redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
     else:
@@ -45,8 +47,17 @@ def toggleLock():
     sleep(0.05)
     return status()
 
-
-
+@app.route('/getStatus', methods=['GET'])
+def getStatus():
+    lockState = redisGet(LOCK_STATE)
+    lockState = lockState if not isinstance(lockState, bytes) else lockState.decode('utf-8')
+    doorState = redisGet(DOOR_STATE)
+    doorState = doorState if not isinstance(doorState,bytes)  else doorState.decode('utf-8')
+    response = Response(
+        response=json.dumps({'lockState': lockState, 'doorState': doorState}),
+        status=200,  
+        mimetype="text/plain")
+    return response
 
 
 @app.route('/unlock', methods=['POST'])
