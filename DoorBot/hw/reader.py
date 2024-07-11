@@ -107,8 +107,8 @@ def main():
                     try:    
                         result = requests.get(url, auth=(user, password))
                     except:
-                        print("request failed")
-                        sys.exit(1)
+                        print("request failed without suppressing verification")
+                        result = requests.get(url, auth=(user, password), verify=False)
                     if result.status_code != 200:
                         if DEBUG:
                             print(f"Did not recognize fob {id}") 

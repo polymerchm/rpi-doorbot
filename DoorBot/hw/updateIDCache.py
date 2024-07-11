@@ -37,8 +37,8 @@ def rebuildCache():
     try:
         results = requests.get(url, auth=auth)
     except:
-        print("requeat failed")
-        sys.exit(1)
+        print("requeat failed, suppressing verification")
+        results = requests.get(url, auth=auth, verify=False)
     if results.status_code != 200:
     # test that it is good, else print an error message to the log and return
         print("Could not retreive id object")
