@@ -9,16 +9,17 @@ import pigpio
 from DoorBot.constants import *
 import DoorBot.Config as Config
 import redis
-import sys, os, signal, time
+import os, signal, sys
 from datetime import datetime
 import jsonpickle
-
+import requests
 
 gpio = Config.get('gpio')
 DEBUG = Config.get('DEBUG')
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe(DOOR_SWITCH_CHANNEL)
+os.environ['NO_PROXY'] = '127.0.0.1'
 
 print("starting the program")
 
@@ -86,7 +87,14 @@ def main():
                 if DEBUG:
                     print(f"Door Switch state={state}, timestamp={timestamp}")
                 redis_cli.set(DOOR_STATE,state)
-                redis_cli.lpush(DOOR_SWITCH_LOG,jsonpickle.encode({'doorstate': state, 'timestamp': timestamp}))  
+                redis_cli.lpush(DOOR_SWITCH_LOG,jsonpickle.encode({'doorstate': state, 'timestamp': timestamp})) 
+      
+                result = requests.get('http://127.0.0.1:5000/doorChange')
+                if result.status_code != 200:
+                    print("wierd return")
+                    sys.exit(1)
+                 
+                
 
     # exit for loop
     print(f"exited the loop and fell through")

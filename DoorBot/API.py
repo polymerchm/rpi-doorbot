@@ -7,18 +7,16 @@ allows interogation of the DoorBot and remotely unlocking it
 """
 
 from redis import Redis
-from flask import Flask, request, jsonify, Response
-import sys, signal, os
+from flask import Flask, Response
+import os
 import DoorBot.Config as Config
-from flask import Flask, request, jsonify, abort, render_template, Response
 from flask_cors import CORS, cross_origin
 from flask_httpauth import HTTPBasicAuth
 from DoorBot.constants import *
 from flask_stache import render_template
 from time import sleep
 import json
-
-
+from flask_sse import sse
 
 DEBUG = Config.get('DEBUG')
 
@@ -30,6 +28,9 @@ def create_app():
 
 app = create_app()
 CORS(app)
+CORS(sse)
+app.register_blueprint(sse, url_prefix='/stream')
+app.config["REDIS_URL"] = "redis://localhost:6379"
 
 redis_cli = Redis()
 
@@ -44,7 +45,7 @@ def toggleLock():
         redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
     else:
         redis_cli.publish(DOOR_LOCK_CHANNEL, 'lock')
-    sleep(0.05)
+    sse.publish({'message':'update'}, type='doorbot.sse')
     return status()
 
 @app.route('/getStatus', methods=['GET'])
@@ -59,15 +60,23 @@ def getStatus():
         mimetype="text/plain")
     return response
 
+@app.route('/doorChange', methods=['GET'])
+def doorChange():
+    sse.publish({'message':'update'}, type='doorbot.sse')
+    return '',200
 
 @app.route('/unlock', methods=['POST'])
 def unlock():
     redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
+    sse.publish({'message':'update'}, type='doorbot.sse')
+    return '',200
 
 
 @app.route('/lock', methods=['POST'])
 def lock():
     redis_cli.publish(DOOR_LOCK_CHANNEL,'lock')
+    sse.publish({'message':'update'}, type='doorbot.sse')
+    return '',200
 
 @app.route('/', methods=['GET'])
 @app.route('/status', methods=['GET'])

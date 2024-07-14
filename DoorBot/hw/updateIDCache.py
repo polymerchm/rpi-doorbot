@@ -33,7 +33,6 @@ def rebuildCache():
     
     #get the current list from the server
     auth = (user, password)
-    print(url)
     try:
         results = requests.get(url, auth=auth)
     except:
@@ -51,7 +50,8 @@ def rebuildCache():
             if value:
                 redis_cli.lpush(FOB_LIST,id)
             else:
-                print(id,value)
+                print(f"invalid id/value pair {id}/{value}")
+                sys.exit(1)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         redis_cli.set(LAST_FOB_LIST_REFRESH, timestamp)
 

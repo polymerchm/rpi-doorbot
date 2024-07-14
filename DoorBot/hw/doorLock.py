@@ -14,6 +14,7 @@ import DoorBot.Config as Config
 import redis
 import sys, os, signal, time
 import threading
+import requests
 
 timing = Config.get('timing')
 gpio = Config.get('gpio')
@@ -30,29 +31,35 @@ pi.set_mode(lock, pigpio.OUTPUT)
 pi.set_pull_up_down(lock, pigpio.PUD_DOWN)
 pi.write(lock,pigpio.LOW)
 
+def updateUI():
+    result = requests.get('http://127.0.0.1:5000/doorChange')
+    if result.status_code != 200:
+        print("wierd return")
 
 def unlockDoor():
     if DEBUG:
         print("open lock request")
     redis_cli.set(LOCK_STATE, 'unlocked')
     pi.write(lock,pigpio.HIGH)
-    
+    updateUI()
 
 def lockDoor():
     if DEBUG:
         print("close lock request")
     redis_cli.set(LOCK_STATE, 'locked')
     pi.write(lock,pigpio.LOW)
+    updateUI()
 
 def signalHandler(sig, frame):
     if DEBUG:
         print(f"stop requested via sigterm or sigint {sig}")
     redis_cli.publish(DOOR_LOCK_CHANNEL,'stop')
 
-def triggerDoorClose():
+def triggerDoorLock():
     if DEBUG:
-        print("lock close triggered")
+        print("door lock triggered")
     redis_cli.publish(DOOR_LOCK_CHANNEL, 'lock')
+ 
 
 
 def main():
@@ -70,7 +77,7 @@ def main():
 
     signal.signal(signal.SIGINT, signalHandler)
     signal.signal(signal.SIGTERM, signalHandler)
-
+    relock = None
     for message in pubsub.listen():
         if DEBUG:
             print(message)
@@ -78,26 +85,32 @@ def main():
             continue
         elif message['type'] == 'message':
             data = message['data'].decode("utf-8")
-            lockState = redis_cli.get(DOOR_STATE).decode("utf-8")
+            lockState = redis_cli.get(LOCK_STATE).decode("utf-8")
             if data == 'unlock' and lockState != 'unlocked':
                 # open the lock and start a timer to close it using threading
                 unlockDoor()
                 delay = float(timing['lockOpenTime'])
                 if DEBUG:
                     print(f"Delay is {delay}")
-                relock = threading.Timer(delay, triggerDoorClose)
+                relock = threading.Timer(delay, triggerDoorLock)
                 relock.start()
             elif data == 'lock' and lockState != 'locked':
+                if relock != None and relock.is_alive():
+                    relock.cancel()
                 lockDoor()
             elif data == 'stop':
                 break
             else:
                 print("invalid message data")
-
+                result = requests.get('http://127.0.0.1:5000/doorChange')
+                if result.status_code != 200:
+                    print("wierd return")
 
     print("Lock daemon stopping")  
     lockDoor()
     redis_cli.set(LOCK_STATE, 'locked')
+    if relock != None and relock.is_alive():
+        relock.cancel()
     pi.stop() 
 
 
