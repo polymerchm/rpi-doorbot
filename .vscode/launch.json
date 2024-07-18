@@ -45,6 +45,18 @@
             "request": "launch",
             "module": "DoorBot.hw.initializeRedis"
         },
+        {
+            "name": "install-scripts",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/venv/bin/flask",
+            "args": [
+                "--app",
+                "DoorBot.API",
+                "install-services" 
+            ],
+            // "postDebugTask": "killdebugger"
+        },
         
         {
             "name": "API",

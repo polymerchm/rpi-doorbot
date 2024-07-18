@@ -121,7 +121,8 @@ def main():
                     if DEBUG:
                         print(f"recognizing FOB id {id}")
                     redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
-                    response = requests.get('http://127.0.0.1:5000/doorChange')    
+                    
+                    response = requests.get('http://127.0.0.1:5000/doorChange')   
                     if response.status_code != 200:
                          print(f"weird response {response.status_code}")           
 

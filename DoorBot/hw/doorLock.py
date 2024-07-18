@@ -32,7 +32,8 @@ pi.set_pull_up_down(lock, pigpio.PUD_DOWN)
 pi.write(lock,pigpio.LOW)
 
 def updateUI():
-    result = requests.get('http://127.0.0.1:5000/doorChange')
+    result = requests.get('http://127.0.0.1:5000/api/doorChange')
+    # result = requests.get('http://api/doorChange')
     if result.status_code != 200:
         print("wierd return")
 
@@ -102,7 +103,8 @@ def main():
                 break
             else:
                 print("invalid message data")
-                result = requests.get('http://127.0.0.1:5000/doorChange')
+                #result = requests.get('http://127.0.0.1:5000/doorChange')
+                result = requests.get('/api/doorChange')
                 if result.status_code != 200:
                     print("wierd return")
 

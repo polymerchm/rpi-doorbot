@@ -1,9 +1,9 @@
 <script>
-    var sse = new EventSource('/stream')
+    var sse = new EventSource('/api/stream')
     sse.addEventListener('doorbot.sse', function(event) {
         var data = JSON.parse(event.data);
         if (data.message === 'update') {
-            $.get('/getStatus', function (data) {
+            $.get('/api/getStatus', function (data) {
                 results = JSON.parse(data)
                 $('#doorstate').html(results.doorState)
                 $('#lockstate').html(results.lockState)
@@ -18,7 +18,7 @@
         <dt>The Lock is <span id="lockstate">{{lockState}}</span></li>
     </ul>
 
-    <form action="/toggleLock"> 
+    <form action="/api/toggleLock"> 
         <button id="togglebutton" type="submit">Toggle Lock</button>
     </form>
  </div>

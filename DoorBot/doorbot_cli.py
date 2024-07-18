@@ -37,8 +37,8 @@ def fullStatus():
     print(f"Last reboot was {redisGet(REBOOT_TIME)}")
     print(f"Last refresh of ID cache was at {redisGet(LAST_FOB_LIST_REFRESH)}")
     print(f"Number of stored IDs is {redis_cli.llen(FOB_LIST)}")
-    print(f"\nDoor State is {redisGet(DOOR_SWITCH)}")
-    print(f"Door Lock is {redisGet(DOOR_LOCK)}")
+    print(f"\nDoor State is {redisGet(DOOR_STATE)}")
+    print(f"Door Lock is {redisGet(LOCK_STATE)}")
     print(f"Last FOB used was {redisGet(LAST_FOB)} at {redisGet(LAST_FOB_TIME)}")
     
 
@@ -52,7 +52,7 @@ def main():
     parser.add_argument('--stop_all', action='store_true')
     parser.add_argument('--restart',  action='store_true')
     parser.add_argument('--reboot', action='store_true')
-    # configuration/status
+    # configuration/botStatus
     parser.add_argument('--location',  action='store_true')
     parser.add_argument('--set_location', nargs='?', action='store', default=None)
     parser.add_argument('--cache_size',  action='store_true')
@@ -68,9 +68,9 @@ def main():
     match vars(args):    
         #actions
         case {'lock':True}:
-            redis_cli.publish(DOOR_LOCK,'lock')
+            redis_cli.publish(DOOR_LOCK_CHANNEL,'lock')
         case {'unlock':True}:
-            redis_cli.publish(DOOR_LOCK,'unlock')
+            redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
         case {'stop_all':True}:
             shutDown()
         case {'restart':True}:
@@ -93,34 +93,10 @@ def main():
         case {'location':True}:
             print(f"Doorbot Location {redisGet(LOCATION)}")
         case {'door_state':True}:
-            print(f"Door State is {redisGet(DOOR_SWITCH)}")
+            print(f"Door is {redisGet(DOOR_STATE)}")
         case {'lock_state':True}:
-            print(f"Door Lock is {redisGet(DOOR_LOCK)}")
+            print(f"Lock is {redisGet(LOCK_STATE)}")
 
-
-
-
-
-
-    # if args.lock:
-    #     redis_cli.publish(DOOR_LOCK, "lock")
-    # elif args.unlock:
-    #     redis_cli.publish(DOOR_LOCK, "unlock")
-    # elif args.get_location()
-    # elif args.stop_all:
-    #     pass
-    # elif args.restart:
-    #     pass
-    # elif args.reboot:
-    #     pass
-    # else:
-    #     print("bad usage")
-        
-    print(args)
-
-
-
-    
 
 if __name__ == '__main__':
     main()
