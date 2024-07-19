@@ -25,15 +25,26 @@ gpio:
 # - door switch     GPIO24 (18)
   
 
-memberpress:
-  user: bodgery
-  password: bodgery
-  base_url: https://mms.thebodgery.org
+server:
+  user: xxxxxxxxx
+  password: xxxxxxxxxxx
+  base_url: xxxxxxxxx
 
 timing:
   timeout: 5 # ms
   lockOpenTime: 30 # seconds
+  rebuildCacheInterval: 3600 # every hour
 
 location:
-   default
+  dummy
+
+valid_locations: 
+  - cleanroom.door
+  - garage.door
+  - woodshop.door
+  - dummy
+  - front.door
+  - back_main.door
+  - back_annex.door
+
 

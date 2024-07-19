@@ -1,4 +1,0 @@
-// DoorBot DOM manipulation functions
-
-
-

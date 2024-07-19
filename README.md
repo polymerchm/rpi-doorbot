@@ -42,7 +42,7 @@ for loop to wait for messages that represent incoming data.
 - watches for door lock requests and enerizes/de-energizes the lock
 - updates the state of the lock in redis
 - ask API to send message for UI updates
-- uses threaded timer to relock thte door after delay
+- uses threaded timer to relock the door after delay
 
 ### doorSwitch.py
 
