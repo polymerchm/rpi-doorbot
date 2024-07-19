@@ -89,10 +89,9 @@ def main():
                 redis_cli.set(DOOR_STATE,state)
                 redis_cli.lpush(DOOR_SWITCH_LOG,jsonpickle.encode({'doorstate': state, 'timestamp': timestamp})) 
       
-                #result = requests.get('http://127.0.0.1:5000/doorChange')
-                result = requests.get('/api/doorChange')
+                result = requests.get('http://127.0.0.1:5000/api/doorChange')
                 if result.status_code != 200:
-                    print("wierd return")
+                    print("wierd return in DoorSwitch")
                     sys.exit(1)
                  
                 

@@ -69,7 +69,7 @@ def getStatus():
 @app.route('/api/doorChange', methods=['GET'])
 def doorChange():
     sse.publish({'message':'update'}, type='doorbot.sse')
-    return '',200
+    return Response(response = 'doorCHange', status=200, mimetype="text/plain")
 
 @app.route('/api/unlock', methods=['POST'])
 def unlock():

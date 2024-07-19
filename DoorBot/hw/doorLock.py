@@ -33,9 +33,8 @@ pi.write(lock,pigpio.LOW)
 
 def updateUI():
     result = requests.get('http://127.0.0.1:5000/api/doorChange')
-    # result = requests.get('http://api/doorChange')
     if result.status_code != 200:
-        print("wierd return")
+        print("wierd return in update UI")
 
 def unlockDoor():
     if DEBUG:
@@ -103,10 +102,9 @@ def main():
                 break
             else:
                 print("invalid message data")
-                #result = requests.get('http://127.0.0.1:5000/doorChange')
-                result = requests.get('/api/doorChange')
+                result = requests.get('http://127.0.0.1:5000/api/doorChange')
                 if result.status_code != 200:
-                    print("wierd return")
+                    print("wierd return in DoorLock")
 
     print("Lock daemon stopping")  
     lockDoor()
