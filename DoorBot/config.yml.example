@@ -6,29 +6,24 @@ gpio:
   data1:        9    #21
   switch:       24   #18
   doorlock:     22   #15
-  reset_button:  3   #05
+  reset_button:  4   #07
   format:       23   #16
   led:          17   #11
   buzzer:       18   #12
+  SDA            2   #03
+  SCL            3   #05
 
 # - Console TxD     GPIO15(8)
 # - Console RxD     GPIO16(10)
 # - Consold GND     GND(6)
 
-# - Weigand 1       GPIO10 (19)  Green Wire
-# - Weigand 2       GPIO09 (21)  White Wire
-# - Reader LED      GPIO17 (11)
-# - Reader Buzzer   GPIO18 (12)
-# - Reader format   GPIO23 (16)
-# - Door (relay)    GPIO22 (15)
-# - reset button    GPIO03 (5)
-# - door switch     GPIO24 (18)
+
   
 
 server:
-  user: xxxxxxxxx
-  password: xxxxxxxxxxx
-  base_url: xxxxxxxxx
+  user: xxxxxxx
+  password: xxxxxxx
+  base_url: xxxxxxx
 
 timing:
   timeout: 5 # ms

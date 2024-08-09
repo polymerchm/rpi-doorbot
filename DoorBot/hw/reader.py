@@ -16,6 +16,9 @@ import DoorBot.hw.wiegand as wiegand
 import DoorBot.Config as Config
 from DoorBot.hw.initializeRedis import initializeRedis
 import pigpio
+from datetime import datetime
+
+
 
 
 
@@ -55,6 +58,24 @@ def callback(bits, value):
 
 def rebuild_id_cache():
     pass
+
+def checkID(id,location):
+    server = Config.get('server')
+    user = server['user']
+    password = server['password']
+    base_url = server['base_url']
+    url = base_url + check_key_request.format(id,location)
+    try:    
+        result = requests.get(url, auth=(user, password))
+    except:
+        print("request failed without suppressing verification")
+        result = requests.get(url, auth=(user, password), verify=False)
+    return result
+
+def doUnlock(id):
+    redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
+    redis_cli.set(LAST_FOB, id)
+    redis_cli.set(LAST_FOB_TIME, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 def main():
     """
@@ -99,28 +120,20 @@ def main():
                     print(f"Position of {id} is {position} in list")
                 if position == None:
                     # not in the local list,  go out to the server
-                    server = Config.get('server')
-                    user = server['user']
-                    password = server['password']
-                    base_url = server['base_url']
-                    url = base_url + check_key_request.format(id,location)
-                    try:    
-                        result = requests.get(url, auth=(user, password))
-                    except:
-                        print("request failed without suppressing verification")
-                        result = requests.get(url, auth=(user, password), verify=False)
+                    result = checkID(id,location)
                     if result.status_code != 200:
                         if DEBUG:
                             print(f"Did not recognize fob {id}") 
                     else:
                         if DEBUG:
                           print(f"recognizing FOB id {id}")
-                        
+                          doUnlock(id)
+
                
                 else: # it is a valid id
                     if DEBUG:
                         print(f"recognizing FOB id {id}")
-                    redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
+                    doUnlock(id)
                    
     w.cancel()
     pi.stop()

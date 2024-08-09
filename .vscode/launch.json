@@ -9,6 +9,7 @@
 
 
 
+
         {
             "name": "doorSwitch",
             "type": "debugpy",
@@ -44,6 +45,12 @@
             "type": "debugpy",
             "request": "launch",
             "module": "DoorBot.hw.initializeRedis"
+        },
+        {
+            "name": "display",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "DoorBot.hw.display"
         },
         {
             "name": "install-scripts",

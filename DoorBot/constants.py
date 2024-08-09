@@ -26,4 +26,5 @@ RESET_BUTTON_CHANNEL = 'reset_button'
 DOOR_LOCK_CHANNEL = 'door_lock_channel'
 DOOR_SWITCH_CHANNEL = 'door_switch_channel'
 READER_CHANNEL = 'reader_channel'
+DISPLAY_CHANNEL = 'display_channel'
 

@@ -2,7 +2,7 @@
 
 ## basic concepts
 
-A set of 6 daemons use redis pubsub.listen() in a 
+A set of 7 daemons use redis pubsub.listen() in a 
 for loop to wait for messages that represent incoming data.  
 
 64-bit Raspian is needed for VSCode to work for remote editing/debugging
@@ -32,7 +32,7 @@ for loop to wait for messages that represent incoming data.
 
 - pigpio library for **ISR** (needs the pigpio daemon running)
 - reads Weigand codes (dat0, dat1)
-        trigger is falling edge on either dat0 or dat1
+- trigger is falling edge on either dat0 or dat1
 - daemon pushes last legal keycode to redis
 - asks API to send sse message for UI update
     
@@ -40,15 +40,15 @@ for loop to wait for messages that represent incoming data.
 ### doorLock.py
 
 - watches for door lock requests and enerizes/de-energizes the lock
-- updates the state of the lock in redis
-- ask API to send message for UI updates
-- uses threaded timer to relock the door after delay
+    - updates the state of the lock in redis
+    - asks API to send message for UI updates
+    - uses threaded timer to relock the door after delay
 
 ### doorSwitch.py
 
 - watches for changes in amagnetic reed switches
-- logs the changes and timestamp to redis
-- asls API to send messsage for UI update
+    - logs the changes and timestamp to redis
+    - asks API to send messsage for UI update
 
 ### updateIDCache.py
 
@@ -57,6 +57,12 @@ for loop to wait for messages that represent incoming data.
 ### reset.py
 
 - after long press on reset button, reboot the reader and reset to "factory default"
+
+### display.py
+
+- maintains an i2C display with the name and ip address of the doorbot.
+    - display is only active after a short touch on the reset button
+    - on long touch, display a reset warning   
 
 ---
 
@@ -85,8 +91,10 @@ for loop to wait for messages that represent incoming data.
 - Reader Buzzer   GPIO18 (12)
 - Reader format   GPIO23 (16)
 - Door (relay)    GPIO22 (15)
-- reset button    GPIO03 (5)
+- reset button    GPIO04 (7)
 - door switch     GPIO24 (18)
+- i2C SDA         GPIO02 (3)
+- i2C SCL         GPIO03 (5)
 
 
 
