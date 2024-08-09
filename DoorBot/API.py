@@ -21,6 +21,7 @@ import json
 from flask_sse import sse
 import DoorBot.service_templates as service_templates
 import DoorBot.script_templates as script_templates
+from DoorBot.redisGet import redisGet
 import errno
 
 
@@ -40,13 +41,10 @@ app.config["REDIS_URL"] = "redis://localhost:6379"
 
 redis_cli = Redis()
 
-def redisGet(key: str, default:any="unset") -> any:
-    result = redis_cli.get(key)
-    return result if result != None else default
 
 @app.route('/api/toggleLock', methods=['GET'])
 def toggleLock():
-    lockState = redisGet(LOCK_STATE).decode("utf-8")
+    lockState = redisGet(LOCK_STATE)
     if lockState == 'locked':
         redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
     else:
@@ -57,9 +55,7 @@ def toggleLock():
 @app.route('/api/getStatus', methods=['GET'])
 def getStatus():
     lockState = redisGet(LOCK_STATE)
-    lockState = lockState if not isinstance(lockState, bytes) else lockState.decode('utf-8')
     doorState = redisGet(DOOR_STATE)
-    doorState = doorState if not isinstance(doorState,bytes)  else doorState.decode('utf-8')
     response = Response(
         response=json.dumps({'lockState': lockState, 'doorState': doorState}),
         status=200,  

@@ -18,16 +18,11 @@ import argparse
 from DoorBot.constants import *
 from DoorBot.hw.getSerialNumber import getSerialNumber
 from DoorBot.shutdownAll import shutDown
+from DoorBot.redisGet import redisGet
 import os
 
 redis_cli = Redis()
 
-def redisGet(key,default=None):
-    value = redis_cli.get(key)
-    if value:
-        return value
-    else:
-        return default
 
 def fullStatus():
     """

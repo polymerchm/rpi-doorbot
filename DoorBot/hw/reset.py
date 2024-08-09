@@ -4,12 +4,19 @@ import os, time
 import pigpio
 import redis
 import DoorBot.Config as Config
+import sys, signal
 
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe(RESET_BUTTON_CHANNEL)
 
+
+
 DEBUG = Config.get('DEBUG')
+
+def signalHandler(sig, frame):
+    redis_cli.publish(RESET_BUTTON_CHANNEL, 'stop')
+
 
 class Button:
     """
@@ -31,14 +38,17 @@ class Button:
         self.pi.set_pull_up_down(self.pin, pigpio.PUD_UP)
         self.pi.set_glitch_filter(self.pin, self.debouce_duration)
         self.cb_button = self.pi.callback(self.pin, pigpio.EITHER_EDGE, self._cb)
-        self.pi.set_watchdog(self.pin, self.long)
     
     def _cb(self, pin, level, tick):
-        if level == pigpio.TIMEOUT:
-            self.pi.set_watchdog(self.pin, 0)
-            redis_cli.publish(RESET_BUTTON_CHANNEL, 'do_reset')
-        else:
+        if level == 0: # button tapped
             self.pi.set_watchdog(self.pin, self.long)
+        elif level == 1: # button released before watchdog
+            self.pi.set_watchdog(self.pin, 0)
+            redis_cli.publish(RESET_BUTTON_CHANNEL, "display")
+        elif level == pigpio.TIMEOUT: # long hold
+            redis_cli.publish(RESET_BUTTON_CHANNEL, 'do_reset')
+            self.pi.set_watchdog(self.pin, 0)
+        
     
     def cancel(self):
         self.pi.stop()
@@ -52,14 +62,19 @@ def resetDoorBot(button: Button):
     else:
         os.system('sudo shutdown -r now')
     
-    
+def callback():
+    print('in callback')
 
 def main():
 
     pi = pigpio.pi()
     gpio = Config.get('gpio')
 
-    button = Button(pi, gpio['reset_button'], shutDown)
+    button = Button(pi, gpio['reset_button'], callback)
+
+    signal.signal(signal.SIGINT, signalHandler)
+    signal.signal(signal.SIGTERM, signalHandler)
+
 
     for message in pubsub.listen():
         if message['type'] == 'subscribe':
@@ -69,11 +84,17 @@ def main():
             if data == 'stop':
                 break
             elif data == 'do_reset':
+                redis_cli.publish(DISPLAY_CHANNEL, "reset")
                 resetDoorBot(button)
+                break
+            elif data == "display":
+                redis_cli.publish(DISPLAY_CHANNEL, "display")
+
     # should never get here
 
 if __name__ == '__main__':
     main()
+
     
 
 

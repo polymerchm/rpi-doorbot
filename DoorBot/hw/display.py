@@ -12,6 +12,7 @@ import DoorBot.Config as Config
 from DoorBot.constants import *
 from DoorBot.hw.getIPAddress import getIPinfo
 from DoorBot.hw.reader import checkID
+from DoorBot.redisGet import redisGet
 import redis
 import signal, os, sys
 import threading
@@ -22,10 +23,6 @@ from pathlib import Path
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
 pubsub.subscribe(DISPLAY_CHANNEL)
-def redisGet(key: str, default:any="unset") -> any:
-    result = redis_cli.get(key)
-    return result if result != None else default
-
 
 display = Config.get('display')
 
@@ -33,7 +30,7 @@ WIDTH = display['width']
 HEIGHT = display['height']
 addr = display['address']
 relativeLogoImagePath = display['image']
-location = redisGet(LOCATION).decode("utf-8")
+location = redisGet(LOCATION)
 DEBUG = Config.get('DEBUG')
 
 
@@ -71,16 +68,16 @@ def normal_display():
     device.clear()
     with canvas(device) as draw:
         draw.text((0,0), f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",fill="white", font=Font)
-        draw.text((0,25), f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH).decode('utf-8')}",fill="white", font=Font)
+        draw.text((0,25), f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}",fill="white", font=Font)
     sleep(delay)
     # last reboot
     device.clear()
     with canvas(device) as draw:
-        draw.text((0,0), f"Last Reboot:\n  {redisGet(REBOOT_TIME).decode('utf-8')}",fill="white", font=Font)
+        draw.text((0,0), f"Last Reboot:\n  {redisGet(REBOOT_TIME)}",fill="white", font=Font)
     sleep(delay)
     #clear the display
-    lastFob = redisGet(LAST_FOB).decode("utf-8")
-    lastEntry = redisGet(LAST_FOB_TIME).decode("utf-8")
+    lastFob = redisGet(LAST_FOB)
+    lastEntry = redisGet(LAST_FOB_TIME)
     result = checkID(lastFob, location)
     if result.status_code != 200:
         print("invalid fob made it through the reader")
@@ -98,6 +95,7 @@ def resetDisplay():
     with canvas(device) as draw:
         draw.text((5,0), f"Reset",fill="white", font=resetFont)
     sleep(3)
+    device.clear()
         
 
 
@@ -117,14 +115,11 @@ def main():
             if data == 'stop':
                 break
             elif data == 'display':
-                normal_display # display the data
+                normal_display() # display the data
             elif data == 'reset':
-                pass # display the reset   
+                resetDisplay() # display the reset   
 
 if __name__ == '__main__':
-    # display the normal output
-    normal_display()
-    resetDisplay()
-    sleep(5)
+    main()
 
 
