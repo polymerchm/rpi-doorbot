@@ -15,6 +15,7 @@ import redis
 import sys, os, signal, time
 import threading
 import requests
+from DoorBot.redisGet import redisGet
 
 timing = Config.get('timing')
 gpio = Config.get('gpio')
@@ -85,7 +86,7 @@ def main():
             continue
         elif message['type'] == 'message':
             data = message['data'].decode("utf-8")
-            lockState = redis_cli.get(LOCK_STATE).decode("utf-8")
+            lockState = redisGet(LOCK_STATE)
             if data == 'unlock' and lockState != 'unlocked':
                 # open the lock and start a timer to close it using threading
                 unlockDoor()

@@ -6,7 +6,7 @@ manage the display on the Doorbot
 from luma.core.interface.serial import i2c
 from luma.oled.device import sh1106
 from luma.core.render import canvas
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 import DoorBot.Config as Config
 from DoorBot.constants import *
@@ -44,6 +44,7 @@ logoPath = Path(__file__).parents[1].joinpath(relativeLogoImagePath)
 logoImage = Image.open(logoPath)
 posn = ((device.width - logoImage.width) // 2, 0)
 
+
 Font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",10)
 
 def displayLogo():
@@ -54,28 +55,18 @@ def displayLogo():
 def signalHandler(sig, frame):
     redis_cli.publish(DISPLAY_CHANNEL, 'stop')
 
+def drawTwoLines(first, second, delay):
+    with canvas(device) as draw:
+        draw.text((0,0), first,fill="white", font=Font)
+        draw.text((0,25), second ,fill="white", font=Font)
+    sleep(delay)
+    device.clear()
+
 def normal_display():
     delay = 2
     displayLogo()
     sleep(delay)
-    # display the name and ip address
     device.clear()
-    with canvas(device) as draw:
-        draw.text((0,0), f"IP: \n   {ipaddress}",fill="white", font=Font)
-        draw.text((0,25), f"Hostname: \n   {hostname}",fill="white", font=Font)
-    sleep(delay)
-    #display the cache size/refresh
-    device.clear()
-    with canvas(device) as draw:
-        draw.text((0,0), f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",fill="white", font=Font)
-        draw.text((0,25), f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}",fill="white", font=Font)
-    sleep(delay)
-    # last reboot
-    device.clear()
-    with canvas(device) as draw:
-        draw.text((0,0), f"Last Reboot:\n  {redisGet(REBOOT_TIME)}",fill="white", font=Font)
-    sleep(delay)
-    #clear the display
     lastFob = redisGet(LAST_FOB)
     lastEntry = redisGet(LAST_FOB_TIME)
     result = checkID(lastFob, location)
@@ -83,17 +74,27 @@ def normal_display():
         print("invalid fob made it through the reader")
         sys.exit(1)
     obj = result.json()
-    with canvas(device) as draw:
-        draw.text((0,0), f"Last Entry:\n {obj['full_name']}",fill="white", font=Font)
-        draw.text((0,25), f"Time:\n  {lastEntry}" ,fill="white", font=Font)
-    sleep(delay)
+    drawTwoLines(f"Last Entry:\n {obj['full_name']}",
+                  f"Time:\n  {lastEntry}", delay)
+    drawTwoLines(
+        f"Location: \n   {location}",
+        f"Last Reboot:\n  {redisGet(REBOOT_TIME)}", delay)
+    drawTwoLines(
+        f"IP: \n   {ipaddress}",
+        f"Hostname: \n   {hostname}", delay
+    )
+    #display the cache size/refresh
     device.clear()
+    drawTwoLines(
+        f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",
+        f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}",delay)
+   
 
 def resetDisplay():
     resetFont = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf",40)
     device.clear()
     with canvas(device) as draw:
-        draw.text((5,0), f"Reset",fill="white", font=resetFont)
+        draw.text((5,0), f"RESET",fill="white", font=resetFont)
     sleep(3)
     device.clear()
         
