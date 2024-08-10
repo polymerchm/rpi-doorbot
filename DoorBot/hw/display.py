@@ -43,6 +43,7 @@ hostname, ipaddress = getIPinfo()
 logoPath = Path(__file__).parents[1].joinpath(relativeLogoImagePath)
 logoImage = Image.open(logoPath)
 posn = ((device.width - logoImage.width) // 2, 0)
+delay = 2 # seconds
 
 
 Font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf",10)
@@ -55,7 +56,7 @@ def displayLogo():
 def signalHandler(sig, frame):
     redis_cli.publish(DISPLAY_CHANNEL, 'stop')
 
-def drawTwoLines(first, second, delay):
+def drawTwoLines(first, second):
     with canvas(device) as draw:
         draw.text((0,0), first,fill="white", font=Font)
         draw.text((0,25), second ,fill="white", font=Font)
@@ -63,10 +64,25 @@ def drawTwoLines(first, second, delay):
     device.clear()
 
 def normal_display():
-    delay = 2
     displayLogo()
     sleep(delay)
     device.clear()
+    displayWho()
+    drawTwoLines(
+        f"Location: \n   {location}",
+        f"Last Reboot:\n  {redisGet(REBOOT_TIME)}")
+    drawTwoLines(
+        f"IP: \n   {ipaddress}",
+        f"Hostname: \n   {hostname}"
+    )
+    #display the cache size/refresh
+    device.clear()
+    drawTwoLines(
+        f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",
+        f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}")
+    
+
+def displayWho():
     lastFob = redisGet(LAST_FOB)
     lastEntry = redisGet(LAST_FOB_TIME)
     result = checkID(lastFob, location)
@@ -76,18 +92,6 @@ def normal_display():
     obj = result.json()
     drawTwoLines(f"Last Entry:\n {obj['full_name']}",
                   f"Time:\n  {lastEntry}", delay)
-    drawTwoLines(
-        f"Location: \n   {location}",
-        f"Last Reboot:\n  {redisGet(REBOOT_TIME)}", delay)
-    drawTwoLines(
-        f"IP: \n   {ipaddress}",
-        f"Hostname: \n   {hostname}", delay
-    )
-    #display the cache size/refresh
-    device.clear()
-    drawTwoLines(
-        f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",
-        f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}",delay)
    
 
 def resetDisplay():
@@ -119,6 +123,8 @@ def main():
                 normal_display() # display the data
             elif data == 'reset':
                 resetDisplay() # display the reset   
+            elif data == "who":
+                displayWho()
 
 if __name__ == '__main__':
     main()

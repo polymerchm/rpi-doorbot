@@ -76,6 +76,7 @@ def doUnlock(id):
     redis_cli.publish(DOOR_LOCK_CHANNEL,'unlock')
     redis_cli.set(LAST_FOB, id)
     redis_cli.set(LAST_FOB_TIME, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+    redis_cli.publish(DISPLAY_CHANNEL,"who")
 
 def main():
     """
