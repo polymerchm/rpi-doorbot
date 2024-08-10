@@ -6,7 +6,7 @@ manage the display on the Doorbot
 from luma.core.interface.serial import i2c
 from luma.oled.device import sh1106
 from luma.core.render import canvas
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageFont
 
 import DoorBot.Config as Config
 from DoorBot.constants import *
@@ -14,8 +14,7 @@ from DoorBot.hw.getIPAddress import getIPinfo
 from DoorBot.hw.reader import checkID
 from DoorBot.redisGet import redisGet
 import redis
-import signal, os, sys
-import threading
+import signal, sys
 from time import sleep
 from pathlib import Path
 

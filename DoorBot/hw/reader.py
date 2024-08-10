@@ -10,7 +10,7 @@ If the ID is valid, send a message via redis doorlock channel to energize the do
 """
 from redis import Redis
 import jsonpickle
-import requests, json
+import requests
 from DoorBot.constants import *
 import DoorBot.hw.wiegand as wiegand
 import DoorBot.Config as Config

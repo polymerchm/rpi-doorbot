@@ -12,7 +12,7 @@ import pigpio
 from DoorBot.constants import * 
 import DoorBot.Config as Config
 import redis
-import sys, os, signal, time
+import signal
 import threading
 import requests
 from DoorBot.redisGet import redisGet

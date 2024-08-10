@@ -4,7 +4,7 @@ import os, time
 import pigpio
 import redis
 import DoorBot.Config as Config
-import sys, signal
+import signal
 
 redis_cli = redis.Redis()
 pubsub = redis_cli.pubsub()
