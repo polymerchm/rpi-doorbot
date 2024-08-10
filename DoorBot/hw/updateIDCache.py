@@ -54,6 +54,7 @@ def rebuildCache():
                 sys.exit(1)
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         redis_cli.set(LAST_FOB_LIST_REFRESH, timestamp)
+        redis_cli.publish(DISPLAY_CHANNEL, "update")
 
 
 def signalHandler(sig, frame):

@@ -76,10 +76,7 @@ def normal_display():
         f"Hostname: \n   {hostname}"
     )
     #display the cache size/refresh
-    device.clear()
-    drawTwoLines(
-        f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",
-        f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}")
+    displayUpdate()
     
 
 def displayWho():
@@ -87,11 +84,17 @@ def displayWho():
     lastEntry = redisGet(LAST_FOB_TIME)
     result = checkID(lastFob, location)
     if result.status_code != 200:
-        print("invalid fob made it through the reader")
+        print(f"invalid fob {lastFob} made it through the reader")
         sys.exit(1)
     obj = result.json()
     drawTwoLines(f"Last Entry:\n {obj['full_name']}",
                   f"Time:\n  {lastEntry}", delay)
+    
+def displayUpdate():
+    device.clear()
+    drawTwoLines(
+        f"CacheSize:\n  {redis_cli.llen(FOB_LIST)}",
+        f"Last Refresh:\n  {redisGet(LAST_FOB_LIST_REFRESH)}")
    
 
 def resetDisplay():
@@ -125,6 +128,8 @@ def main():
                 resetDisplay() # display the reset   
             elif data == "who":
                 displayWho()
+            elif data == "update":
+                displayUpdate()
 
 if __name__ == '__main__':
     main()
