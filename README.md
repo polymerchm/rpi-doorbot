@@ -12,7 +12,8 @@ for loop to wait for messages that represent incoming data.
 - holds a list a valid keyfobs
 - hold time of last fob list refresh
 - holds serial number info for RPI
-- hold the time of the last reboot
+- holds id of last read successful fob
+- hold time of last successful fob 
 - redis pubsub capabilty used for interprocess communication   
 
 ---
