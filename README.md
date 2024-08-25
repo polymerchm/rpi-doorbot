@@ -57,11 +57,13 @@ for loop to wait for messages that represent incoming data.
 
 ### reset.py
 
-- after long press on reset button, reboot the reader and reset to "factory default"
+- after long press on reset button, reboot the reader
+  - reset to "factory default" (not et implemented)
+- after a short press, displays state of the doorbot 
 
 ### display.py
 
-- maintains an i2C display with the name and ip address of the doorbot.
+- maintains an i2C display
     - display is only active after a short touch on the reset button
     - on long touch, display a reset warning   
 

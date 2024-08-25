@@ -19,9 +19,20 @@ from DoorBot.constants import *
 from DoorBot.hw.getSerialNumber import getSerialNumber
 from DoorBot.shutdownAll import shutDown
 from DoorBot.redisGet import redisGet
-import os
+from DoorBot.hw.reader import checkID
+import sys
+
 
 redis_cli = Redis()
+
+def userName() -> str:
+
+    lastFob = redisGet(LAST_FOB)
+    result = checkID(lastFob, redisGet(LOCATION))
+    if result.status_code != 200:
+        print(f"invalid fob {lastFob} made it through the reader")
+        sys.exit(1)
+    return result.json()['full_name']
 
 
 def fullStatus():
@@ -35,6 +46,7 @@ def fullStatus():
     print(f"\nDoor State is {redisGet(DOOR_STATE)}")
     print(f"Door Lock is {redisGet(LOCK_STATE)}")
     print(f"Last FOB used was {redisGet(LAST_FOB)} at {redisGet(LAST_FOB_TIME)}")
+    print(f"Member {userName()}")
     
 
 def main():
@@ -56,6 +68,7 @@ def main():
     parser.add_argument('--door_state',  action='store_true')
     parser.add_argument('--lock_state',  action='store_true')
     parser.add_argument('--status', action='store_true')
+    parser.add_argument('--who', action='store_true')
     args = parser.parse_args()
 
     redis_cli = Redis()
@@ -73,8 +86,9 @@ def main():
         case {'reboot':True}:
             pass
         case {'set_location':new_location} if new_location != None:
+            # check new location in data base TODO
             old_location = redisGet(LOCATION)
-            redis_cli.get(LOCATION, new_location)
+            redis_cli.set(LOCATION, new_location)
             print(f"Location reset from {old_location} to {new_location}")
         #outputs
         case {'status':True}:
@@ -91,6 +105,8 @@ def main():
             print(f"Door is {redisGet(DOOR_STATE)}")
         case {'lock_state':True}:
             print(f"Lock is {redisGet(LOCK_STATE)}")
+        case {'who': True}:
+            print(f"Member {userName()}")
 
 
 if __name__ == '__main__':
